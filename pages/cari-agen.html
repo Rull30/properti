@@ -32,23 +32,7 @@
 <body class="bg-[#f5f5f5] text-slate-800 antialiased">
 
 
-    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex h-14 sm:h-16 items-center justify-between gap-4">
-                 <a href="/" class="flex items-center gap-1 shrink-0">
-                    <span class="text-2xl sm:text-[1.65rem] font-bold tracking-tight text-brand">Dunia</span>
-                    <span class="text-2xl sm:text-[1.65rem] font-bold tracking-tight text-slate-900">Rumah</span>
-                    <span class="text-2xl sm:text-[1.65rem] font-bold tracking-tight text-brand">Pro</span>
-                </a>
-                <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
-                    <a href="cari-properti" class="hover:text-brand transition">Carikan Properti</a>
-                    <a href="peta-properti" class="hover:text-brand transition">Peta</a>
-                    <a href="cari-agen" class="text-brand font-semibold">Cari Agen</a>
-                    <a href="kalkulator-kpr" class="hover:text-brand transition">Kalkulator KPR</a>
-                </nav>
-            </div>
-        </div>
-    </header>
+    <div data-navbar-host data-navbar-active="cari-agen"></div>
 
     <section class="bg-white border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
@@ -480,5 +464,6 @@
     render();
 })();
     </script>
+    <script type="module" src="/src/navbar.js"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@ require('dotenv').config();
 const app = express();
 const ROOT_DIR = __dirname;
 const PAGES_DIR = path.join(ROOT_DIR, 'pages');
+const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
 const DATA_DIR = path.join(ROOT_DIR, 'data');
 const LISTINGS_FILE = path.join(DATA_DIR, 'listings.json');
 const AGENTS_FILE = path.join(DATA_DIR, 'agents.json');
@@ -173,6 +174,8 @@ app.delete('/api/agents/:id', (req, res) => {
 
 // Static assets (JS/data/images) tetap dari root.
 app.use(express.static(ROOT_DIR));
+// Public assets (shared partials/components for frontend runtime fetch).
+app.use(express.static(PUBLIC_DIR));
 // HTML pages dari folder pages.
 app.use(express.static(PAGES_DIR));
 

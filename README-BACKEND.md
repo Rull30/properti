@@ -25,6 +25,12 @@ Atau mode production:
 npm start
 ```
 
+Untuk develop frontend dengan Vite:
+
+```bash
+npm run dev:vite
+```
+
 ## 3) Akses
 
 - App: `http://127.0.0.1:5500`
@@ -64,3 +70,13 @@ Saat pertama kali dijalankan, backend otomatis seed data dari `listings-data.js`
 - Jika ingin tambah halaman baru:
   1. Buat file HTML di `pages/`.
   2. Tambah route baru di `routes-manual.js`.
+
+## 7) Shared Navbar (1 file)
+
+- Template navbar bersama: `public/components/navbar.html`
+- Loader navbar: `src/navbar.js`
+- Halaman yang memakai navbar cukup punya:
+  - `<div data-navbar-host data-navbar-active="..."></div>`
+  - `<script type="module" src="/src/navbar.js"></script>`
+
+Jadi perubahan navbar cukup di satu file template.
