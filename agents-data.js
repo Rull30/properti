@@ -20,8 +20,8 @@
             bio: 'Spesialis properti residensial di Jakarta Selatan dan sekitarnya. Membantu ratusan klien sejak 2019 dengan pendekatan transparan dan negosiasi yang adil.',
             joinDate: '2019-04-12',
             listings: [
-                { title: 'Rumah minimalis modern Pondok Indah', price: 'Rp 1,25 Miliar', loc: 'Pondok Indah, Jakarta Selatan', img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: 'properti-detail.html?id=1' },
-                { title: 'Apartemen view TB Simatupang', price: 'Rp 920 Juta', loc: 'Cilandak, Jakarta Selatan', img: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: 'properti-detail.html?id=4' }
+                { title: 'Rumah minimalis modern Pondok Indah', price: 'Rp 1,25 Miliar', loc: 'Pondok Indah, Jakarta Selatan', img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: '/properti-detail?id=1' },
+                { title: 'Apartemen view TB Simatupang', price: 'Rp 920 Juta', loc: 'Cilandak, Jakarta Selatan', img: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: '/properti-detail?id=4' }
             ]
         },
         {
@@ -41,8 +41,8 @@
             bio: 'Fokus pada hunian di dataran tinggi Bandung dan properti investasi tanah strategis. Tim kami siap mendampingi dari survei hingga akad.',
             joinDate: '2021-02-01',
             listings: [
-                { title: 'Villa asri nuansa alam', price: 'Rp 45 Jt/thn', loc: 'Lembang, Bandung', img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: 'properti-detail.html?id=2' },
-                { title: 'Kost putri dekat kampus', price: 'Rp 4,5 Jt/thn', loc: 'Dago, Bandung', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: 'properti-detail.html?id=7' }
+                { title: 'Villa asri nuansa alam', price: 'Rp 45 Jt/thn', loc: 'Lembang, Bandung', img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: '/properti-detail?id=2' },
+                { title: 'Kost putri dekat kampus', price: 'Rp 4,5 Jt/thn', loc: 'Dago, Bandung', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: '/properti-detail?id=7' }
             ]
         },
         {
@@ -62,7 +62,7 @@
             bio: 'Mengenal pasar properti Cianjur dan Bogor secara mendalam. Cocok untuk pencarian rumah pertama atau investasi cluster.',
             joinDate: '2022-08-20',
             listings: [
-                { title: 'Cluster strategis tengah kota', price: 'Rp 850 Juta', loc: 'Cianjur Kota', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: 'properti-detail.html?id=3' }
+                { title: 'Cluster strategis tengah kota', price: 'Rp 850 Juta', loc: 'Cianjur Kota', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: '/properti-detail?id=3' }
             ]
         },
         {
@@ -102,7 +102,7 @@
             bio: 'Sepuluh tahun berpengalaman di pasar Surabaya Timur dan Sidoarjo. Tim legal kami membantu due diligence sebelum transaksi.',
             joinDate: '2015-01-15',
             listings: [
-                { title: 'Apartemen studio furnished', price: 'Rp 42 Jt/thn', loc: 'Wiyung, Surabaya', img: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: 'properti-detail.html?id=9' }
+                { title: 'Apartemen studio furnished', price: 'Rp 42 Jt/thn', loc: 'Wiyung, Surabaya', img: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: '/properti-detail?id=9' }
             ]
         },
         {
@@ -122,7 +122,7 @@
             bio: 'Spesialis tanah kavling dan rumah secondary di Cakung, Bekasi, dan sekitarnya.',
             joinDate: '2020-06-01',
             listings: [
-                { title: 'Tanah kavling siap bangun', price: 'Rp 780 Juta', loc: 'Cakung', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: 'properti-detail.html?id=6' }
+                { title: 'Tanah kavling siap bangun', price: 'Rp 780 Juta', loc: 'Cakung', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: '/properti-detail?id=6' }
             ]
         },
         {
@@ -142,7 +142,7 @@
             bio: 'Fokus pada properti premium di Pantai Indah Kapuk dan kawasan pantai Utara Jakarta.',
             joinDate: '2018-03-10',
             listings: [
-                { title: 'Rumah secondary PIK', price: 'Rp 4,5 Miliar', loc: 'Pantai Indah Kapuk', img: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: 'properti-detail.html?id=10' }
+                { title: 'Rumah secondary PIK', price: 'Rp 4,5 Miliar', loc: 'Pantai Indah Kapuk', img: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', url: '/properti-detail?id=10' }
             ]
         },
         {
