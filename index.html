@@ -95,8 +95,8 @@
                 </div>
                 <div class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap gap-2">
                     <span class="text-xs text-slate-500 w-full sm:w-auto mb-1 sm:mb-0">Penawaran khusus:</span>
-                    <a href="#" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Di bawah NJOP</a>
-                    <a href="#" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Turun harga</a>
+                    <a href="cari-properti.html?transaksi=dijual&harga_max=1000&urut=price_asc" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Di bawah NJOP</a>
+                    <a href="cari-properti.html?transaksi=dijual&urut=price_asc" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Turun harga</a>
                 </div>
             </form>
         </div>
@@ -117,13 +117,13 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h2 class="text-lg font-bold text-slate-900">Pencarian properti populer</h2>
-            <button type="button" class="text-sm text-brand font-semibold hover:underline self-start sm:self-auto">Acak pencarian</button>
+            <button type="button" id="btn-random-popular-searches" class="text-sm text-brand font-semibold hover:underline self-start sm:self-auto">Acak pencarian</button>
         </div>
-        <div class="flex flex-wrap gap-2">
-            <a href="#" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Rumah Dijual Jakarta Selatan</a>
-            <a href="#" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Apartemen Disewa Bandung</a>
-            <a href="#" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Tanah Strategis Surabaya</a>
-            <a href="#" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Ruko Tangerang</a>
+        <div id="popular-search-chips" class="flex flex-wrap gap-2">
+            <a href="cari-properti.html?q=Rumah&transaksi=dijual&kota=Jakarta%20Selatan" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Rumah Dijual Jakarta Selatan</a>
+            <a href="cari-properti.html?q=Apartemen&transaksi=disewa&kota=Bandung" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Apartemen Disewa Bandung</a>
+            <a href="cari-properti.html?q=Tanah&transaksi=dijual&kota=Surabaya" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Tanah Dijual Surabaya</a>
+            <a href="cari-properti.html?q=Ruko&kota=Tangerang" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Ruko Tangerang</a>
         </div>
     </section>
 
@@ -137,15 +137,15 @@
                     <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">KPR</div>
                     <span class="text-sm font-semibold text-slate-800">Simulasi KPR</span>
                 </a>
-                <a href="#" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                <a href="take-over-kpr.html" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
                     <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">%</div>
                     <span class="text-sm font-semibold text-slate-800">Take Over KPR</span>
                 </a>
-                <a href="#" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                <a href="tanya-forum.html" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
                     <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">?</div>
                     <span class="text-sm font-semibold text-slate-800">Tanya forum</span>
                 </a>
-                <a href="#" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                <a href="panduan-beli.html" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
                     <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">★</div>
                     <span class="text-sm font-semibold text-slate-800">Panduan beli</span>
                 </a>
@@ -183,7 +183,7 @@
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-900 mb-2">Beli properti aman</h3>
                     <p class="text-sm text-slate-600 mb-4">Bantu temukan hunian idaman dengan data yang transparan.</p>
-                    <a href="#" class="text-brand text-sm font-semibold hover:underline">Cari properti →</a>
+                    <a href="beli-properti-aman.html" class="text-brand text-sm font-semibold hover:underline">Cari properti →</a>
                 </div>
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-900 mb-2">Listing oleh agen</h3>
@@ -193,7 +193,7 @@
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-900 mb-2">Mitra terpercaya</h3>
                     <p class="text-sm text-slate-600 mb-4">Agen dan pengembang terverifikasi untuk ketenangan Anda.</p>
-                    <a href="#" class="text-brand text-sm font-semibold hover:underline">Pelajari lebih lanjut →</a>
+                    <a href="mitra-terpercaya.html" class="text-brand text-sm font-semibold hover:underline">Pelajari lebih lanjut →</a>
                 </div>
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-900 mb-2">Info KPR lengkap</h3>
@@ -378,6 +378,86 @@
                 { enableHighAccuracy: true, timeout: 20000, maximumAge: 120000 }
             );
         });
+    })();
+
+    (function () {
+        var chipsWrap = document.getElementById('popular-search-chips');
+        var randomBtn = document.getElementById('btn-random-popular-searches');
+        var listings = Array.isArray(window.LISTINGS) ? window.LISTINGS.slice() : [];
+        if (!chipsWrap || !randomBtn || !listings.length) return;
+
+        function esc(s) {
+            var d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        function cap(s) {
+            if (!s) return '';
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
+        function toTypeLabel(type) {
+            if (typeof window.typeLabel === 'function') return window.typeLabel(type);
+            return cap(type || '');
+        }
+
+        function toTransLabel(trans) {
+            return trans === 'disewa' ? 'Disewa' : 'Dijual';
+        }
+
+        function buildHref(item) {
+            var params = new URLSearchParams();
+            if (item.query) params.set('q', item.query);
+            if (item.city) params.set('kota', item.city);
+            if (item.transaction) params.set('transaksi', item.transaction);
+            if (item.type) params.append('tipe', item.type);
+            return 'cari-properti.html?' + params.toString();
+        }
+
+        function shuffle(arr) {
+            var a = arr.slice();
+            for (var i = a.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var tmp = a[i];
+                a[i] = a[j];
+                a[j] = tmp;
+            }
+            return a;
+        }
+
+        function createSearchPool() {
+            var seen = {};
+            var out = [];
+            listings.forEach(function (p) {
+                if (!p || !p.type || !p.city) return;
+                var label = toTypeLabel(p.type) + ' ' + toTransLabel(p.transaction) + ' ' + p.city;
+                var key = [p.type, p.transaction || '', p.city].join('|').toLowerCase();
+                if (seen[key]) return;
+                seen[key] = true;
+                out.push({
+                    label: label,
+                    query: toTypeLabel(p.type),
+                    city: p.city,
+                    transaction: p.transaction || '',
+                    type: p.type
+                });
+            });
+            return out;
+        }
+
+        var searchPool = createSearchPool();
+        if (!searchPool.length) return;
+
+        function renderRandomSearches() {
+            var picks = shuffle(searchPool).slice(0, 6);
+            chipsWrap.innerHTML = picks.map(function (item) {
+                return '<a href="' + esc(buildHref(item)) + '" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">' + esc(item.label) + '</a>';
+            }).join('');
+        }
+
+        randomBtn.addEventListener('click', renderRandomSearches);
+        renderRandomSearches();
     })();
     </script>
 
