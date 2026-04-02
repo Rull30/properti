@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil | Rumah123 Agen</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' } },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+    <script src="auth.js"></script>
+</head>
+<body class="bg-[#f0f2f5] text-slate-800 min-h-screen antialiased">
+    <script>
+        (function () {
+            if (typeof AgentAuth === 'undefined') { window.location.href = 'login.html'; return; }
+            if (!AgentAuth.isLoggedIn()) { window.location.href = 'login.html'; }
+        })();
+    </script>
+
+    <div class="min-h-screen flex">
+        <aside class="hidden md:flex w-56 lg:w-64 bg-slate-900 text-slate-300 flex-col shrink-0">
+            <div class="p-5 border-b border-slate-700/80">
+                <div class="flex items-baseline gap-1">
+                    <span class="text-xl font-bold text-brand">Rumah</span>
+                    <span class="text-xl font-bold text-white">123</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">Panel agen</p>
+            </div>
+            <nav class="flex-1 p-3 space-y-1">
+                <a href="dashboard.html" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Dashboard</a>
+                <a href="listing-saya.html" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Listing saya</a>
+                <a href="pesan.html" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Pesan</a>
+                <a href="profil.html" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Profil</a>
+            </nav>
+            <div class="p-3 border-t border-slate-700/80">
+                <a href="../index.html" class="block text-xs text-slate-500 hover:text-white px-3 py-2">← Situs publik</a>
+                <button type="button" id="btn-logout" class="mt-2 w-full text-left px-3 py-2 text-sm text-red-400 hover:text-red-300 rounded-lg hover:bg-white/5">Keluar</button>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col min-w-0">
+            <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold text-slate-900">Profil agen</h1>
+                        <p class="text-sm text-slate-500">Data tampil di sisi publik (simulasi)</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="agent-badge" class="hidden sm:inline text-sm text-slate-600 truncate max-w-[200px]"></span>
+                        <button type="button" id="btn-logout-mobile" class="md:hidden text-sm font-medium text-brand">Keluar</button>
+                    </div>
+                </div>
+                <nav class="md:hidden mt-4 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 text-sm">
+                    <a href="dashboard.html" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Dashboard</a>
+                    <a href="listing-saya.html" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Listing</a>
+                    <a href="pesan.html" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Pesan</a>
+                    <a href="profil.html" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Profil</a>
+                </nav>
+            </header>
+
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-2xl">
+                <p id="save-msg" class="hidden mb-4 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-4 py-3">Perubahan disimpan di perangkat ini (demo).</p>
+
+                <form id="form-profil" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama tampilan</label>
+                        <input type="text" id="nama" name="nama" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none" placeholder="Nama lengkap">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Email login</label>
+                        <input type="email" id="email" readonly class="w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Nomor WhatsApp</label>
+                        <input type="tel" id="wa" name="wa" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none" placeholder="62812xxxxxxxx">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama kantor / broker</label>
+                        <input type="text" id="kantor" name="kantor" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none" placeholder="Contoh: Prime Property">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Kota operasional</label>
+                        <input type="text" id="kota" name="kota" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none" placeholder="Jakarta Selatan">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Bio singkat</label>
+                        <textarea id="bio" name="bio" rows="4" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none resize-y" placeholder="Ceritakan pengalaman dan area spesialisasi Anda…"></textarea>
+                    </div>
+                    <div class="flex flex-wrap gap-3 pt-2">
+                        <button type="submit" class="bg-brand hover:bg-brand-dark text-white font-bold py-3 px-8 rounded-xl shadow-md transition">Simpan profil</button>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+    <script>
+(function () {
+    if (!AgentAuth.isLoggedIn()) return;
+
+    var STORAGE = 'rumah123_agent_profil_v1';
+
+    document.getElementById('agent-badge').textContent = AgentAuth.getEmail();
+    document.getElementById('email').value = AgentAuth.getEmail();
+
+    function loadProfil() {
+        var data = {};
+        try {
+            var raw = localStorage.getItem(STORAGE);
+            if (raw) data = JSON.parse(raw) || {};
+        } catch (e) {}
+        document.getElementById('nama').value = data.nama || AgentAuth.getName() || '';
+        document.getElementById('wa').value = data.wa || '';
+        document.getElementById('kantor').value = data.kantor || 'Prime Property Indonesia';
+        document.getElementById('kota').value = data.kota || 'Jakarta Selatan';
+        document.getElementById('bio').value = data.bio || 'Spesialis properti residensial di Jakarta dan sekitarnya.';
+    }
+
+    document.getElementById('form-profil').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var payload = {
+            nama: document.getElementById('nama').value.trim(),
+            wa: document.getElementById('wa').value.trim(),
+            kantor: document.getElementById('kantor').value.trim(),
+            kota: document.getElementById('kota').value.trim(),
+            bio: document.getElementById('bio').value.trim()
+        };
+        localStorage.setItem(STORAGE, JSON.stringify(payload));
+        if (payload.nama) {
+            AgentAuth.login(AgentAuth.getEmail(), payload.nama.charAt(0).toUpperCase() + payload.nama.slice(1));
+        }
+        var msg = document.getElementById('save-msg');
+        msg.classList.remove('hidden');
+        setTimeout(function () { msg.classList.add('hidden'); }, 4000);
+    });
+
+    function doLogout() {
+        AgentAuth.logout();
+        window.location.href = 'login.html';
+    }
+    document.getElementById('btn-logout').addEventListener('click', doLogout);
+    document.getElementById('btn-logout-mobile').addEventListener('click', doLogout);
+
+    loadProfil();
+})();
+    </script>
+</body>
+</html>
