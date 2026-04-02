@@ -126,6 +126,24 @@
         return d.innerHTML;
     }
 
+    function formatCompactPrice(p) {
+        var juta = Number(p && p.priceJuta);
+        if (!isFinite(juta) || juta < 0) return '—';
+        var rupiah = juta * 1000000;
+        var suffix = p && p.transaction === 'disewa' ? ' / tahun' : '';
+
+        function trim2(n) {
+            var v = Math.round(n * 100) / 100;
+            return String(v).replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
+        }
+
+        if (rupiah >= 1e12) return 'Rp ' + trim2(rupiah / 1e12) + ' Triliun' + suffix;
+        if (rupiah >= 1e9) return 'Rp ' + trim2(rupiah / 1e9) + ' Miliar' + suffix;
+        if (rupiah >= 1e6) return 'Rp ' + trim2(rupiah / 1e6) + ' Juta' + suffix;
+        if (rupiah >= 1e3) return 'Rp ' + trim2(rupiah / 1e3) + ' Ribu' + suffix;
+        return 'Rp ' + Math.round(rupiah).toLocaleString('id-ID') + suffix;
+    }
+
     function render(filter) {
         var body = document.getElementById('listing-body');
         var empty = document.getElementById('listing-empty');
@@ -138,7 +156,8 @@
             return {
                 id: p.id,
                 title: p.title,
-                price: window.formatListingPrice(p),
+                price: formatCompactPrice(p),
+                pricePerM2: p.type === 'tanah' && p.pricePerM2 ? p.pricePerM2 : null,
                 status: status,
                 views: views,
                 filter: filt
@@ -159,7 +178,7 @@
             var detail = detailBase(r.id);
             tr.innerHTML =
                 '<td class="px-4 py-3"><p class="font-medium text-slate-900">' + esc(r.title) + '</p><p class="text-xs text-slate-400 mt-0.5">ID: LST-' + esc(r.id) + '</p></td>' +
-                '<td class="px-4 py-3 text-slate-800 whitespace-nowrap">' + esc(r.price) + '</td>' +
+                '<td class="px-4 py-3 text-slate-800 whitespace-nowrap">' + esc(r.price) + (r.pricePerM2 ? '<div class="text-xs text-slate-500 mt-0.5">Rp ' + esc(Number(r.pricePerM2).toLocaleString('id-ID')) + ' / m²</div>' : '') + '</td>' +
                 '<td class="px-4 py-3">' + badgeStatus(r.status) + '</td>' +
                 '<td class="px-4 py-3 text-slate-600">' + r.views.toLocaleString('id-ID') + '</td>' +
                 '<td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">' +

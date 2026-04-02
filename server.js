@@ -4,6 +4,7 @@ const vm = require('vm');
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const multer = require('multer');
 require('dotenv').config();
 
 const app = express();
@@ -13,6 +14,7 @@ const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
 const DATA_DIR = path.join(ROOT_DIR, 'data');
 const LISTINGS_FILE = path.join(DATA_DIR, 'listings.json');
 const AGENTS_FILE = path.join(DATA_DIR, 'agents.json');
+const UPLOADS_DIR = path.join(PUBLIC_DIR, 'uploads');
 const PAGE_ROUTES = require('./routes-manual');
 
 const PORT = Number(process.env.PORT || 5500);
@@ -82,10 +84,54 @@ function seedIfNeeded() {
   if (!hasAgents) writeJsonArray(AGENTS_FILE, agentsSeed);
 }
 
+function ensureUploadsDir() {
+  if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+function sanitizeBaseName(name) {
+  return String(name || 'file')
+    .replace(/\.[^.]+$/, '')
+    .replace(/[^\w\-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase() || 'file';
+}
+
+function uniqueUploadName(originalName) {
+  const ext = path.extname(originalName || '').toLowerCase() || '.jpg';
+  const base = sanitizeBaseName(originalName);
+  let candidate = `${base}${ext}`;
+  let i = 1;
+  while (fs.existsSync(path.join(UPLOADS_DIR, candidate))) {
+    candidate = `${base}-${i}${ext}`;
+    i += 1;
+  }
+  return candidate;
+}
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      ensureUploadsDir();
+      cb(null, UPLOADS_DIR);
+    },
+    filename: (_req, file, cb) => {
+      cb(null, uniqueUploadName(file.originalname));
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024, files: 20 },
+});
+
 seedIfNeeded();
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, service: 'properti-backend', port: PORT });
+});
+
+app.post('/api/upload-images', upload.array('images', 20), (req, res) => {
+  const files = Array.isArray(req.files) ? req.files : [];
+  const urls = files.map((f) => `/uploads/${f.filename}`);
+  res.status(201).json({ uploaded: urls.length, files: urls });
 });
 
 app.get('/api/listings', (_req, res) => {
