@@ -27,6 +27,10 @@
         @media (min-width: 1024px) {
             #map { min-height: calc(100vh - 11rem); }
         }
+        .leaflet-container img.leaflet-tile,
+        .leaflet-container .leaflet-marker-icon img {
+            max-width: none !important;
+        }
         .leaflet-container { font-family: inherit; }
         .map-card-active { ring: 2px solid #E02020; }
     </style>

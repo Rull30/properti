@@ -1,6 +1,7 @@
 /**
  * Data listing properti — sumber utama untuk beranda, cari, peta, detail, dan panel agen (setelah merge).
  * Field wajib: id, title, transaction, type, city, location, priceJuta, beds, baths, land, build, cert, nego, date, lat, lng, agentId, whatsapp, agentName
+ * Opsional: locationRadiusM — radius lingkaran area perkiraan di halaman detail (meter), default 420.
  * Gambar: `images` (array URL). Jika kosong, fallback ke `image` (satu foto).
  */
 (function (w) {
@@ -24,6 +25,7 @@
                 newProperty: false,
                 lat: -6.2652,
                 lng: 106.785,
+                locationRadiusM: 450,
                 agentId: '1',
                 agentName: 'Budi Santoso',
                 whatsapp: '6281234567890',

@@ -18,7 +18,22 @@
             },
         };
     </script>
-    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        /* Tailwind Preflight memaksa max-width pada img — ubin Leaflet jadi tidak tampil (layar abu-abu) */
+        .leaflet-container img.leaflet-tile,
+        .leaflet-container img.leaflet-image-layer,
+        .leaflet-container .leaflet-marker-icon img,
+        .leaflet-container .leaflet-marker-shadow {
+            max-width: none !important;
+        }
+        .leaflet-container svg {
+            max-width: none !important;
+        }
+        .leaflet-container { font-family: inherit; z-index: 0; }
+        .detail-pin .leaflet-marker-icon { background: transparent; border: none; }
+    </style>
 </head>
 <body class="bg-[#f5f5f5] text-slate-800 antialiased">
 
@@ -84,10 +99,10 @@
                     <section class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                         <div class="p-5 pb-0">
                             <h2 class="text-lg font-bold text-slate-900">Lokasi</h2>
-                            <p class="text-sm text-slate-500 mt-1">Perkiraan posisi di peta</p>
+                            <p class="text-sm text-slate-500 mt-1">Pin menunjuk perkiraan titik lokasi; lingkaran menunjuk area perkiraan di sekitarnya (bukan batas pasti).</p>
                         </div>
-                        <div class="mt-4 h-56 sm:h-64 bg-slate-200 relative">
-                            <iframe id="map-iframe" title="Peta lokasi" class="absolute inset-0 w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src=""></iframe>
+                        <div class="mt-4 h-56 sm:h-64 bg-slate-100 relative">
+                            <div id="detail-map" class="absolute inset-0 w-full h-full" role="img" aria-label="Peta lokasi properti"></div>
                         </div>
                     </section>
                 </div>
@@ -116,6 +131,7 @@
     <script src="listings-data.js"></script>
     <script src="listings-user-storage.js"></script>
     <script src="agents-data.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script>
 (function () {
     function esc(s) {
@@ -232,9 +248,72 @@
     var lng = parseFloat(p.lng);
     if (isNaN(lat)) lat = -6.2;
     if (isNaN(lng)) lng = 106.8;
-    var d = 0.012;
-    var bbox = (lng - d) + '%2C' + (lat - d) + '%2C' + (lng + d) + '%2C' + (lat + d);
-    document.getElementById('map-iframe').src = 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + encodeURIComponent(lat + '%2C' + lng);
+
+    (function initDetailMap() {
+        var mapEl = document.getElementById('detail-map');
+        if (!mapEl || typeof L === 'undefined') return;
+
+        var radiusM = parseFloat(p.locationRadiusM, 10);
+        if (isNaN(radiusM) || radiusM <= 0) radiusM = 420;
+
+        /** Bounds dari titik pusat + radius meter — hindari circle.getBounds() sebelum peta siap (hindari error Leaflet). */
+        function boundsAround(lat0, lng0, rM) {
+            var R = 6371000;
+            var dLat = (rM / R) * (180 / Math.PI);
+            var cos = Math.cos(lat0 * Math.PI / 180);
+            var dLng = cos > 0.01 ? (rM / (R * cos)) * (180 / Math.PI) : dLat;
+            return L.latLngBounds(
+                [lat0 - dLat, lng0 - dLng],
+                [lat0 + dLat, lng0 + dLng]
+            );
+        }
+
+        var map = L.map('detail-map', { scrollWheelZoom: false, attributionControl: true });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        L.circle([lat, lng], {
+            radius: radiusM,
+            color: '#E02020',
+            fillColor: '#E02020',
+            fillOpacity: 0.14,
+            weight: 2,
+            opacity: 0.9
+        }).addTo(map);
+
+        var pinHtml =
+            '<div class="flex flex-col items-center" style="transform:translateY(-4px)">' +
+            '<svg width="40" height="52" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+            '<path d="M20 0C8.954 0 0 8.28 0 18.5C0 32.75 20 52 20 52S40 32.75 40 18.5C40 8.28 31.046 0 20 0Z" fill="#E02020"/>' +
+            '<circle cx="20" cy="18" r="6" fill="white"/>' +
+            '</svg></div>';
+
+        var pinIcon = L.divIcon({
+            className: 'detail-pin',
+            html: pinHtml,
+            iconSize: [40, 52],
+            iconAnchor: [20, 52],
+            popupAnchor: [0, -48]
+        });
+
+        L.marker([lat, lng], { icon: pinIcon, zIndexOffset: 1000 }).addTo(map);
+
+        function fitMap() {
+            try {
+                map.fitBounds(boundsAround(lat, lng, radiusM), { padding: [28, 28], maxZoom: 16 });
+            } catch (e) {
+                map.setView([lat, lng], 15);
+            }
+        }
+
+        map.whenReady(fitMap);
+        setTimeout(function () {
+            map.invalidateSize();
+            fitMap();
+        }, 200);
+    })();
 
     var agent = typeof window.getAgentById === 'function' ? window.getAgentById(p.agentId) : null;
     var aname = agent ? agent.name : p.agentName;

@@ -80,7 +80,8 @@
                 </label>
                 <label>
                     <span class="text-sm font-medium text-slate-700">Harga (juta Rp)</span>
-                    <input type="number" name="priceJuta" id="f-priceJuta" required min="0" step="0.1" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="850">
+                    <input type="text" name="priceJuta" id="f-priceJuta" required inputmode="decimal" autocomplete="off" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none tabular-nums" placeholder="1.250,5">
+                    <span class="text-xs text-slate-500 mt-1 block">Format angka Indonesia (contoh: <span class="font-mono">850</span> atau <span class="font-mono">1.250,5</span> juta)</span>
                 </label>
                 <label>
                     <span class="text-sm font-medium text-slate-700">Kode listing (opsional)</span>
@@ -158,6 +159,40 @@
 
     <script>
 (function () {
+    function formatJuta(n) {
+        if (n == null || n === '' || (typeof n === 'number' && isNaN(n))) return '';
+        var num = typeof n === 'number' ? n : parseJuta(String(n));
+        if (isNaN(num)) return '';
+        return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(num);
+    }
+
+    function parseJuta(str) {
+        if (str == null) return NaN;
+        var s = String(str).trim().replace(/\s/g, '');
+        if (!s) return NaN;
+        s = s.replace(/\./g, '');
+        if (s.indexOf(',') !== -1) s = s.replace(',', '.');
+        var x = parseFloat(s);
+        return isNaN(x) ? NaN : x;
+    }
+
+    function toPriceEditString(n) {
+        if (isNaN(n)) return '';
+        var s = String(n);
+        if (s.indexOf('e') !== -1 || s.indexOf('E') !== -1) return formatJuta(n);
+        return s.replace('.', ',');
+    }
+
+    var priceEl = document.getElementById('f-priceJuta');
+    priceEl.addEventListener('blur', function () {
+        var n = parseJuta(priceEl.value);
+        if (!isNaN(n) && n >= 0) priceEl.value = formatJuta(n);
+    });
+    priceEl.addEventListener('focus', function () {
+        var n = parseJuta(priceEl.value);
+        if (!isNaN(n) && priceEl.value.trim() !== '') priceEl.value = toPriceEditString(n);
+    });
+
     var sel = document.getElementById('f-agentId');
     if (window.AGENTS) {
         window.AGENTS.forEach(function (a) {
@@ -181,7 +216,7 @@
         document.getElementById('f-city').value = existing.city || '';
         document.getElementById('f-location').value = existing.location || '';
         document.getElementById('f-address').value = existing.address || '';
-        document.getElementById('f-priceJuta').value = existing.priceJuta != null ? existing.priceJuta : '';
+        document.getElementById('f-priceJuta').value = existing.priceJuta != null ? formatJuta(existing.priceJuta) : '';
         document.getElementById('f-listingCode').value = existing.listingCode || '';
         document.getElementById('f-beds').value = existing.beds != null ? existing.beds : 0;
         document.getElementById('f-baths').value = existing.baths != null ? existing.baths : 0;
@@ -241,7 +276,7 @@
             city: document.getElementById('f-city').value.trim(),
             location: document.getElementById('f-location').value.trim(),
             address: document.getElementById('f-address').value.trim(),
-            priceJuta: parseFloat(document.getElementById('f-priceJuta').value, 10),
+            priceJuta: parseJuta(document.getElementById('f-priceJuta').value),
             listingCode: document.getElementById('f-listingCode').value.trim(),
             beds: parseInt(document.getElementById('f-beds').value, 10) || 0,
             baths: parseInt(document.getElementById('f-baths').value, 10) || 0,
@@ -268,11 +303,12 @@
             return;
         }
         obj.image = obj.images[0];
-        if (isNaN(obj.priceJuta)) {
-            err.textContent = 'Harga tidak valid.';
+        if (isNaN(obj.priceJuta) || obj.priceJuta < 0) {
+            err.textContent = 'Harga tidak valid. Gunakan angka (contoh: 850 atau 1.250,5).';
             err.classList.remove('hidden');
             return;
         }
+        document.getElementById('f-priceJuta').value = formatJuta(obj.priceJuta);
         if (isNaN(obj.lat) || isNaN(obj.lng)) {
             obj.lat = -6.2;
             obj.lng = 106.8;
