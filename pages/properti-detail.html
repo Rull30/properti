@@ -128,9 +128,9 @@
         </div>
     </footer>
 
-    <script src="listings-data.js"></script>
-    <script src="listings-user-storage.js"></script>
-    <script src="agents-data.js"></script>
+    <script src="/listings-data.js"></script>
+    <script src="/listings-user-storage.js"></script>
+    <script src="/agents-data.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script>
 (function () {
@@ -319,6 +319,16 @@
     var aname = agent ? agent.name : p.agentName;
     var initials = aname ? aname.split(/\s+/).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase() : '?';
     var ahref = agent ? 'agen-detail.html?id=' + encodeURIComponent(agent.id) : '#';
+    var waNumber = p && p.whatsapp ? String(p.whatsapp) : (agent && agent.phone ? String(agent.phone) : '');
+    var detailPath = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl(p.id) : ('properti-detail.html?id=' + encodeURIComponent(String(p.id)));
+    var detailUrl = '';
+    try {
+        detailUrl = new URL(detailPath, window.location.origin).href;
+    } catch (e) {
+        detailUrl = detailPath;
+    }
+    var waMsg = 'permisi, saya tertarik dengan properti ini.\n\nLink detail properti:\n' + detailUrl;
+    var waHref = 'https://wa.me/' + encodeURIComponent(waNumber) + '?text=' + encodeURIComponent(waMsg);
     document.getElementById('agent-card').innerHTML =
         '<h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Hubungi agen</h2>' +
         '<div class="flex items-center gap-3 mb-4">' +
@@ -327,7 +337,7 @@
         '<a href="' + ahref + '" class="font-bold text-slate-900 hover:text-brand">' + esc(aname) + '</a>' +
         (agent ? '<p class="text-sm text-slate-500">' + esc(agent.agency) + '</p>' : '') +
         '</div></div>' +
-        '<a href="https://wa.me/' + esc(p.whatsapp) + '" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition mb-2">Chat WhatsApp</a>';
+        '<a href="' + esc(waHref) + '" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition mb-2">Chat WhatsApp</a>';
 
     var similar = window.LISTINGS.filter(function (x) {
         return String(x.id) !== String(p.id) && x.city === p.city;

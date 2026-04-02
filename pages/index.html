@@ -240,8 +240,9 @@
         </div>
     </footer>
 
-    <script src="listings-data.js"></script>
-    <script src="listings-user-storage.js"></script>
+    <script src="/agents-data.js"></script>
+    <script src="/listings-data.js"></script>
+    <script src="/listings-user-storage.js"></script>
     <script>
     (function () {
         var grid = document.getElementById('home-featured-grid');
@@ -253,6 +254,23 @@
             var d = document.createElement('div');
             d.textContent = s;
             return d.innerHTML;
+        }
+
+        function buildWhatsAppHref(p) {
+            var waNumber = String(p.whatsapp || '');
+            if (typeof window.getAgentById === 'function' && p && p.agentId != null) {
+                var agent = window.getAgentById(p.agentId);
+                if (agent && agent.phone) waNumber = String(agent.phone);
+            }
+            var detailPath = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl(p.id) : p.detailUrl;
+            var detailUrl = '';
+            try {
+                detailUrl = new URL(detailPath, window.location.origin).href;
+            } catch (e) {
+                detailUrl = detailPath || '';
+            }
+            var msg = 'permisi, saya tertarik dengan properti ini.\n\nLink detail properti:\n' + detailUrl;
+            return 'https://wa.me/' + encodeURIComponent(waNumber) + '?text=' + encodeURIComponent(msg);
         }
 
         if (grid && L && L.length && typeof fmtHome === 'function') {
@@ -281,7 +299,7 @@
                 '<div class="flex justify-between text-sm text-slate-600 border-t border-slate-100 pt-3">' + spec + '</div></div></a>' +
                 '<div class="px-4 pb-4 flex items-center justify-between border-t border-slate-100 pt-3">' +
                 '<span class="text-sm text-slate-600">' + esc(p.agentName) + '</span>' +
-                '<a href="https://wa.me/' + esc(p.whatsapp) + '" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-white bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded-lg">WhatsApp</a></div>';
+                '<a href="' + esc(buildWhatsAppHref(p)) + '" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-white bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded-lg">WhatsApp</a></div>';
             grid.appendChild(article);
         });
         }
