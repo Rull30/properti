@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form listing | Rumah123 Agen</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' } },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+    <script src="auth.js"></script>
+    <script src="../listings-data.js"></script>
+    <script src="../listings-user-storage.js"></script>
+    <script src="../agents-data.js"></script>
+</head>
+<body class="bg-[#f0f2f5] text-slate-800 min-h-screen antialiased">
+    <script>
+        (function () {
+            if (typeof AgentAuth === 'undefined') { window.location.href = 'login.html'; return; }
+            if (!AgentAuth.isLoggedIn()) { window.location.href = 'login.html'; }
+        })();
+    </script>
+
+    <div class="min-h-screen flex flex-col max-w-3xl mx-auto px-4 py-6 sm:py-10">
+        <div class="mb-6 flex items-center justify-between gap-4">
+            <div>
+                <a href="listing-saya" class="text-sm text-brand font-medium hover:underline">← Kembali ke listing</a>
+                <h1 id="form-title" class="text-xl font-bold text-slate-900 mt-2">Listing baru</h1>
+            </div>
+        </div>
+
+        <form id="listing-form" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-8 space-y-5">
+            <input type="hidden" name="id" id="f-id" value="">
+
+            <div class="grid sm:grid-cols-2 gap-4">
+                <label class="block sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Judul iklan</span>
+                    <input type="text" name="title" id="f-title" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none" placeholder="Contoh: Rumah 2 lantai dekat tol">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Transaksi</span>
+                    <select name="transaction" id="f-transaction" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none bg-white">
+                        <option value="dijual">Dijual</option>
+                        <option value="disewa">Disewa</option>
+                    </select>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Tipe</span>
+                    <select name="type" id="f-type" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none bg-white">
+                        <option value="rumah">Rumah</option>
+                        <option value="apartemen">Apartemen</option>
+                        <option value="ruko">Ruko</option>
+                        <option value="tanah">Tanah</option>
+                        <option value="kost">Kost</option>
+                    </select>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Kota / kabupaten</span>
+                    <input type="text" name="city" id="f-city" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Jakarta Selatan">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Area / kecamatan</span>
+                    <input type="text" name="location" id="f-location" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Pondok Indah">
+                </label>
+                <label class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Alamat lengkap</span>
+                    <input type="text" name="address" id="f-address" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Jl. …">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Harga (Rp)</span>
+                    <input type="text" name="priceRupiah" id="f-priceJuta" required inputmode="numeric" autocomplete="off" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none tabular-nums" placeholder="1.250.000.000">
+                    <span class="text-xs text-slate-500 mt-1 block">Masukkan harga normal Rupiah (contoh: <span class="font-mono">850.000.000</span> atau <span class="font-mono">45.000.000</span>).</span>
+                </label>
+                <label id="f-price-perm2-wrap" class="hidden">
+                    <span class="text-sm font-medium text-slate-700">Harga per m² (khusus tanah)</span>
+                    <input type="text" name="pricePerM2Rupiah" id="f-pricePerM2" inputmode="numeric" autocomplete="off" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none tabular-nums" placeholder="4.500.000">
+                    <span class="text-xs text-slate-500 mt-1 block">Opsional. Jika diisi, akan tampil sebagai harga per meter persegi.</span>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Kode listing (opsional)</span>
+                    <input type="text" name="listingCode" id="f-listingCode" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="RMH-XXX-001">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">KT</span>
+                    <input type="number" name="beds" id="f-beds" min="0" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" value="0">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">KM</span>
+                    <input type="number" name="baths" id="f-baths" min="0" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" value="0">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Luas tanah (m²)</span>
+                    <input type="number" name="land" id="f-land" min="0" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" value="0">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Luas bangunan (m²)</span>
+                    <input type="number" name="build" id="f-build" min="0" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" value="0">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Sertifikat</span>
+                    <select name="cert" id="f-cert" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 bg-white focus:ring-brand outline-none">
+                        <option value="SHM">SHM</option>
+                        <option value="HGB">HGB</option>
+                        <option value="Hak Pakai">Hak Pakai</option>
+                    </select>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Agen</span>
+                    <select name="agentId" id="f-agentId" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 bg-white focus:ring-brand outline-none"></select>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">WhatsApp (62…)</span>
+                    <input type="text" name="whatsapp" id="f-whatsapp" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="6281234567890">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Latitude</span>
+                    <input type="text" name="lat" id="f-lat" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="-6.265">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Longitude</span>
+                    <input type="text" name="lng" id="f-lng" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="106.785">
+                </label>
+                <div class="sm:col-span-2 flex items-center gap-6 flex-wrap">
+                    <span class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" name="nego" id="f-nego" class="rounded border-slate-300 text-brand focus:ring-brand"> <span class="text-sm font-medium text-slate-700">Bisa nego</span></span>
+                    <span class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" name="newProperty" id="f-newProperty" class="rounded border-slate-300 text-brand focus:ring-brand"> <span class="text-sm font-medium text-slate-700">Properti baru</span></span>
+                </div>
+                <div class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700 block">Foto properti</span>
+                    <div id="dropzone" class="mt-1 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center hover:border-brand/60 transition cursor-pointer">
+                        <p class="text-sm text-slate-700 font-medium">Drag & drop gambar ke sini</p>
+                        <p class="text-xs text-slate-500 mt-1">atau klik untuk pilih file (JPG/PNG/WebP, max 10MB/file)</p>
+                        <input type="file" id="f-images-upload" accept="image/*" multiple class="hidden">
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-2" id="uploaded-images-list"></div>
+                </div>
+                <label class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Deskripsi (paragraf dipisah baris kosong)</span>
+                    <textarea name="description" id="f-description" rows="6" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Paragraf pertama…"></textarea>
+                </label>
+                <div class="sm:col-span-2">
+                    <div class="flex items-center justify-between gap-3 mb-1">
+                        <span class="text-sm font-medium text-slate-700">Fasilitas</span>
+                        <button type="button" id="btn-add-facility" class="text-xs font-semibold text-brand hover:underline">+ Tambah fasilitas</button>
+                    </div>
+                    <div id="f-facilities-list" class="space-y-2"></div>
+                    <p class="text-xs text-slate-500 mt-1">Isi fasilitas per baris, tidak perlu pakai koma.</p>
+                </div>
+                <label class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Catatan cicilan / sewa (opsional)</span>
+                    <input type="text" name="installmentHint" id="f-installmentHint" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none">
+                </label>
+            </div>
+
+            <p id="form-error" class="hidden text-sm text-red-600"></p>
+            <div class="flex flex-wrap gap-3 pt-2">
+                <button type="submit" class="inline-flex items-center justify-center bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3 rounded-xl transition">Simpan</button>
+                <a href="listing-saya" class="inline-flex items-center justify-center border border-slate-200 text-slate-700 font-medium px-6 py-3 rounded-xl hover:bg-slate-50">Batal</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+(function () {
+    function formatRupiah(n) {
+        if (n == null || n === '' || (typeof n === 'number' && isNaN(n))) return '';
+        var num = typeof n === 'number' ? n : parseRupiah(String(n));
+        if (isNaN(num)) return '';
+        return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(Math.round(num));
+    }
+
+    function parseRupiah(str) {
+        if (str == null) return NaN;
+        var s = String(str).trim();
+        if (!s) return NaN;
+        s = s.replace(/[^\d]/g, '');
+        var x = parseInt(s, 10);
+        return isNaN(x) ? NaN : x;
+    }
+
+    var priceEl = document.getElementById('f-priceJuta');
+    var typeEl = document.getElementById('f-type');
+    var landEl = document.getElementById('f-land');
+    var pricePerM2Wrap = document.getElementById('f-price-perm2-wrap');
+    var pricePerM2El = document.getElementById('f-pricePerM2');
+    var dropzoneEl = document.getElementById('dropzone');
+    var uploadInputEl = document.getElementById('f-images-upload');
+    var uploadedListEl = document.getElementById('uploaded-images-list');
+    var facilitiesListEl = document.getElementById('f-facilities-list');
+    var addFacilityBtn = document.getElementById('btn-add-facility');
+    var uploadedImages = [];
+
+    function toggleTanahFields() {
+        var isTanah = typeEl.value === 'tanah';
+        pricePerM2Wrap.classList.toggle('hidden', !isTanah);
+        document.getElementById('f-beds').disabled = isTanah;
+        document.getElementById('f-baths').disabled = isTanah;
+        document.getElementById('f-build').disabled = isTanah;
+        if (isTanah) {
+            document.getElementById('f-beds').value = 0;
+            document.getElementById('f-baths').value = 0;
+            document.getElementById('f-build').value = 0;
+        } else {
+            pricePerM2El.value = '';
+        }
+    }
+
+    function escAttr(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    }
+
+    function renderUploadedImages() {
+        uploadedListEl.innerHTML = uploadedImages.map(function (url, i) {
+            return (
+                '<div class="group relative w-24 h-16 rounded-lg overflow-hidden border border-slate-200 bg-white">' +
+                '<img src="' + escAttr(url) + '" alt="" class="w-full h-full object-cover">' +
+                '<button type="button" data-rm-idx="' + i + '" class="absolute top-1 right-1 text-[10px] bg-black/70 text-white px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">Hapus</button>' +
+                '</div>'
+            );
+        }).join('');
+        uploadedListEl.querySelectorAll('[data-rm-idx]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var idx = parseInt(btn.getAttribute('data-rm-idx'), 10);
+                if (!isNaN(idx)) uploadedImages.splice(idx, 1);
+                renderUploadedImages();
+            });
+        });
+    }
+
+    async function uploadFiles(files) {
+        if (!files || !files.length) return;
+        var formData = new FormData();
+        Array.prototype.forEach.call(files, function (f) {
+            formData.append('images', f);
+        });
+        var res = await fetch('/api/upload-images', { method: 'POST', body: formData });
+        if (!res.ok) throw new Error('upload');
+        var data = await res.json();
+        if (data && Array.isArray(data.files)) {
+            uploadedImages = uploadedImages.concat(data.files);
+            renderUploadedImages();
+        }
+    }
+
+    function attachDropzone() {
+        dropzoneEl.addEventListener('click', function () {
+            uploadInputEl.click();
+        });
+        uploadInputEl.addEventListener('change', async function () {
+            try {
+                await uploadFiles(uploadInputEl.files);
+            } catch (e) {
+                document.getElementById('form-error').textContent = 'Upload gambar gagal. Coba lagi.';
+                document.getElementById('form-error').classList.remove('hidden');
+            } finally {
+                uploadInputEl.value = '';
+            }
+        });
+        ['dragenter', 'dragover'].forEach(function (evt) {
+            dropzoneEl.addEventListener(evt, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzoneEl.classList.add('border-brand');
+            });
+        });
+        ['dragleave', 'drop'].forEach(function (evt) {
+            dropzoneEl.addEventListener(evt, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzoneEl.classList.remove('border-brand');
+            });
+        });
+        dropzoneEl.addEventListener('drop', async function (e) {
+            var files = e.dataTransfer && e.dataTransfer.files;
+            try {
+                await uploadFiles(files);
+            } catch (err) {
+                document.getElementById('form-error').textContent = 'Upload gambar gagal. Coba lagi.';
+                document.getElementById('form-error').classList.remove('hidden');
+            }
+        });
+    }
+
+    function renderFacilities(items) {
+        var arr = Array.isArray(items) && items.length ? items.slice() : [''];
+        facilitiesListEl.innerHTML = arr.map(function (val, i) {
+            return (
+                '<div class="flex items-center gap-2">' +
+                '<input type="text" value="' + escAttr(val || '') + '" class="facility-input w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Contoh: Carport">' +
+                '<button type="button" data-rm-fac="' + i + '" class="shrink-0 px-2.5 py-2 rounded-lg border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200" title="Hapus">✕</button>' +
+                '</div>'
+            );
+        }).join('');
+
+        facilitiesListEl.querySelectorAll('[data-rm-fac]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var rows = collectFacilities();
+                var idx = parseInt(btn.getAttribute('data-rm-fac'), 10);
+                if (!isNaN(idx)) rows.splice(idx, 1);
+                if (!rows.length) rows.push('');
+                renderFacilities(rows);
+            });
+        });
+    }
+
+    function collectFacilities() {
+        return Array.prototype.map.call(
+            facilitiesListEl.querySelectorAll('.facility-input'),
+            function (el) { return el.value.trim(); }
+        ).filter(Boolean);
+    }
+
+    priceEl.addEventListener('blur', function () {
+        var n = parseRupiah(priceEl.value);
+        if (!isNaN(n) && n >= 0) priceEl.value = formatRupiah(n);
+    });
+    priceEl.addEventListener('focus', function () {
+        var n = parseRupiah(priceEl.value);
+        if (!isNaN(n) && priceEl.value.trim() !== '') priceEl.value = String(n);
+    });
+    pricePerM2El.addEventListener('blur', function () {
+        var n = parseRupiah(pricePerM2El.value);
+        if (!isNaN(n) && n >= 0) pricePerM2El.value = formatRupiah(n);
+    });
+    pricePerM2El.addEventListener('focus', function () {
+        var n = parseRupiah(pricePerM2El.value);
+        if (!isNaN(n) && pricePerM2El.value.trim() !== '') pricePerM2El.value = String(n);
+    });
+    typeEl.addEventListener('change', toggleTanahFields);
+
+    var sel = document.getElementById('f-agentId');
+    if (window.AGENTS) {
+        window.AGENTS.forEach(function (a) {
+            var o = document.createElement('option');
+            o.value = a.id;
+            o.textContent = a.name + ' — ' + a.city;
+            sel.appendChild(o);
+        });
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var editId = params.get('id');
+    var existing = editId ? window.getListingById(editId) : null;
+
+    if (existing) {
+        document.getElementById('form-title').textContent = 'Edit listing';
+        document.getElementById('f-id').value = existing.id;
+        document.getElementById('f-title').value = existing.title || '';
+        document.getElementById('f-transaction').value = existing.transaction || 'dijual';
+        document.getElementById('f-type').value = existing.type || 'rumah';
+        document.getElementById('f-city').value = existing.city || '';
+        document.getElementById('f-location').value = existing.location || '';
+        document.getElementById('f-address').value = existing.address || '';
+        document.getElementById('f-priceJuta').value = existing.priceJuta != null ? formatRupiah(existing.priceJuta * 1000000) : '';
+        document.getElementById('f-listingCode').value = existing.listingCode || '';
+        document.getElementById('f-beds').value = existing.beds != null ? existing.beds : 0;
+        document.getElementById('f-baths').value = existing.baths != null ? existing.baths : 0;
+        document.getElementById('f-land').value = existing.land != null ? existing.land : 0;
+        document.getElementById('f-build').value = existing.build != null ? existing.build : 0;
+        if (existing.pricePerM2 != null && !isNaN(existing.pricePerM2)) {
+            document.getElementById('f-pricePerM2').value = formatRupiah(existing.pricePerM2);
+        } else if (existing.type === 'tanah' && existing.land > 0 && existing.priceJuta > 0) {
+            document.getElementById('f-pricePerM2').value = formatRupiah((existing.priceJuta * 1000000) / existing.land);
+        }
+        document.getElementById('f-cert').value = existing.cert || 'SHM';
+        if (existing.agentId) document.getElementById('f-agentId').value = existing.agentId;
+        document.getElementById('f-whatsapp').value = existing.whatsapp || '';
+        document.getElementById('f-lat').value = existing.lat != null ? existing.lat : '';
+        document.getElementById('f-lng').value = existing.lng != null ? existing.lng : '';
+        document.getElementById('f-nego').checked = !!existing.nego;
+        document.getElementById('f-newProperty').checked = !!existing.newProperty;
+        uploadedImages = (window.getListingImages(existing) || []).slice();
+        renderUploadedImages();
+        var desc = existing.description;
+        document.getElementById('f-description').value = Array.isArray(desc) ? desc.join('\n\n') : (desc || '');
+        renderFacilities(existing.facilities || []);
+        document.getElementById('f-installmentHint').value = existing.installmentHint || '';
+    } else if (sel.options.length) {
+        sel.selectedIndex = 0;
+        var a0 = window.AGENTS && window.AGENTS[0];
+        if (a0 && a0.phone && !document.getElementById('f-whatsapp').value) {
+            document.getElementById('f-whatsapp').value = a0.phone;
+        }
+    }
+    toggleTanahFields();
+    attachDropzone();
+    if (!existing) renderFacilities(['']);
+    addFacilityBtn.addEventListener('click', function () {
+        var rows = collectFacilities();
+        rows.push('');
+        renderFacilities(rows);
+    });
+
+    function nextId() {
+        var max = 0;
+        window.LISTINGS.forEach(function (p) {
+            var n = parseInt(p.id, 10);
+            if (!isNaN(n) && n > max) max = n;
+        });
+        return String(max + 1);
+    }
+
+    document.getElementById('listing-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var err = document.getElementById('form-error');
+        err.classList.add('hidden');
+
+        var idVal = document.getElementById('f-id').value.trim();
+        if (!idVal) idVal = nextId();
+
+        var imgLines = uploadedImages.slice();
+        var ag = window.getAgentById ? window.getAgentById(document.getElementById('f-agentId').value) : null;
+
+        var descText = document.getElementById('f-description').value.trim();
+        var descArr = descText ? descText.split(/\n\s*\n/).map(function (x) { return x.trim(); }).filter(Boolean) : [''];
+
+        var facilities = collectFacilities();
+        var totalRupiah = parseRupiah(document.getElementById('f-priceJuta').value);
+        var pricePerM2 = parseRupiah(document.getElementById('f-pricePerM2').value);
+        var landNum = parseFloat(landEl.value, 10) || 0;
+        var isTanah = typeEl.value === 'tanah';
+        if (isTanah && !isNaN(pricePerM2) && pricePerM2 > 0 && landNum > 0) {
+            totalRupiah = Math.round(pricePerM2 * landNum);
+        }
+
+        var obj = {
+            id: idVal,
+            title: document.getElementById('f-title').value.trim(),
+            transaction: document.getElementById('f-transaction').value,
+            type: document.getElementById('f-type').value,
+            city: document.getElementById('f-city').value.trim(),
+            location: document.getElementById('f-location').value.trim(),
+            address: document.getElementById('f-address').value.trim(),
+            priceJuta: totalRupiah / 1000000,
+            pricePerM2: isTanah && !isNaN(pricePerM2) && pricePerM2 > 0 ? pricePerM2 : null,
+            listingCode: document.getElementById('f-listingCode').value.trim(),
+            beds: parseInt(document.getElementById('f-beds').value, 10) || 0,
+            baths: parseInt(document.getElementById('f-baths').value, 10) || 0,
+            land: parseFloat(document.getElementById('f-land').value, 10) || 0,
+            build: parseFloat(document.getElementById('f-build').value, 10) || 0,
+            cert: document.getElementById('f-cert').value,
+            agentId: document.getElementById('f-agentId').value,
+            agentName: ag ? ag.name : '',
+            whatsapp: document.getElementById('f-whatsapp').value.trim(),
+            lat: parseFloat(document.getElementById('f-lat').value, 10),
+            lng: parseFloat(document.getElementById('f-lng').value, 10),
+            nego: document.getElementById('f-nego').checked,
+            newProperty: document.getElementById('f-newProperty').checked,
+            images: imgLines,
+            description: descArr,
+            facilities: facilities,
+            installmentHint: document.getElementById('f-installmentHint').value.trim(),
+            date: new Date().toISOString().slice(0, 10)
+        };
+
+        if (!obj.images.length) {
+            err.textContent = 'Upload minimal satu foto.';
+            err.classList.remove('hidden');
+            return;
+        }
+        obj.image = obj.images[0];
+        if (isNaN(obj.priceJuta) || obj.priceJuta < 0) {
+            err.textContent = 'Harga tidak valid. Gunakan angka Rupiah (contoh: 850000000).';
+            err.classList.remove('hidden');
+            return;
+        }
+        document.getElementById('f-priceJuta').value = formatRupiah(obj.priceJuta * 1000000);
+        if (isNaN(obj.lat) || isNaN(obj.lng)) {
+            obj.lat = -6.2;
+            obj.lng = 106.8;
+        }
+
+        try {
+            var raw = localStorage.getItem('portal_listings_user');
+            var arr = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(arr)) arr = [];
+            var idx = arr.findIndex(function (x) { return String(x.id) === String(obj.id); });
+            if (idx >= 0) arr[idx] = obj;
+            else arr.push(obj);
+            localStorage.setItem('portal_listings_user', JSON.stringify(arr));
+        } catch (ex) {
+            err.textContent = 'Gagal menyimpan.';
+            err.classList.remove('hidden');
+            return;
+        }
+
+        window.location.href = 'listing-saya.html';
+    });
+})();
+    </script>
+</body>
+</html>

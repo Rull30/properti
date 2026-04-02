@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jual Beli Properti Rumah Apartemen | Portal Properti</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            DEFAULT: '#E02020',
+                            dark: '#C41E1E',
+                            light: '#FFF5F5',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .tab-active { background: #fff; color: #E02020; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+        .tab-inactive { color: #64748b; }
+    </style>
+</head>
+<body class="bg-[#f5f5f5] text-slate-800 antialiased">
+
+    <!-- Header utama -->
+    <%- include('partials/navbar') %>
+
+    <!-- Hero + pencarian -->
+    <section class="relative bg-gradient-to-b from-white to-[#f0f4f8] pt-8 pb-12 sm:pt-10 sm:pb-16 border-b border-slate-200/60">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+                Jual Beli dan Sewa Properti Jadi Mudah
+            </h1>
+            <p class="text-slate-500 text-sm sm:text-base mb-8">Cari rumah, apartemen, atau ruko di seluruh Indonesia</p>
+
+            <!-- Tab Dijual / Disewa / Properti Baru -->
+            <div class="inline-flex p-1 rounded-xl bg-slate-200/80 mb-6 shadow-inner" role="tablist" aria-label="Jenis penawaran">
+                <button type="button" role="tab" aria-selected="true" data-trans="dijual" class="home-trans-tab tab-active px-4 sm:px-8 py-2.5 rounded-lg text-sm font-semibold transition">Dijual</button>
+                <button type="button" role="tab" aria-selected="false" data-trans="disewa" class="home-trans-tab tab-inactive px-4 sm:px-8 py-2.5 rounded-lg text-sm font-semibold hover:text-slate-800 transition">Disewa</button>
+                <button type="button" role="tab" aria-selected="false" data-trans="baru" class="home-trans-tab tab-inactive px-4 sm:px-8 py-2.5 rounded-lg text-sm font-semibold hover:text-slate-800 transition">Properti Baru</button>
+            </div>
+
+            <!-- Kotak pencarian -->
+            <form action="cari-properti" method="get" id="home-search-form" class="bg-white rounded-2xl shadow-lg border border-slate-100 p-4 sm:p-5 text-left max-w-3xl mx-auto">
+                <input type="hidden" name="transaksi" id="home-trans" value="dijual">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="flex-1 relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </span>
+                        <input type="text" name="q" id="home-search-q" placeholder="Lokasi, area, atau nama properti" autocomplete="address-level2" class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none text-slate-800 placeholder:text-slate-400">
+                    </div>
+                    <button type="submit" class="shrink-0 bg-brand hover:bg-brand-dark text-white font-bold py-3.5 px-8 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                        Cari
+                    </button>
+                </div>
+                <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                    <button type="button" id="btn-use-location" class="text-brand font-medium hover:underline inline-flex items-center gap-1 disabled:opacity-50 disabled:cursor-wait">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span id="btn-use-location-label">Gunakan lokasi saat ini</span>
+                    </button>
+                    <span class="hidden sm:inline text-slate-300">|</span>
+                    <a href="cari-properti" class="text-slate-600 hover:text-brand font-medium">Filter lanjutan</a>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap gap-2">
+                    <span class="text-xs text-slate-500 w-full sm:w-auto mb-1 sm:mb-0">Penawaran khusus:</span>
+                    <a href="cari-properti?transaksi=dijual&harga_max=1000&urut=price_asc" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Di bawah NJOP</a>
+                    <a href="cari-properti?transaksi=dijual&urut=price_asc" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Turun harga</a>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Banner promo peta (strip) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-10 relative z-10">
+        <a href="peta-properti" class="group block rounded-xl bg-slate-800 text-white px-4 sm:px-6 py-4 sm:py-5 shadow-md hover:bg-slate-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2">
+            <p class="text-sm sm:text-base font-medium text-center flex flex-wrap items-center justify-center gap-2">
+                <svg class="w-5 h-5 shrink-0 text-brand opacity-90 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                <span>Jelajahi properti di kota favoritmu lewat peta interaktif.</span>
+                <span class="text-brand font-semibold group-hover:underline whitespace-nowrap">Buka peta →</span>
+            </p>
+        </a>
+    </div>
+
+    <!-- Pencarian populer -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <h2 class="text-lg font-bold text-slate-900">Pencarian properti populer</h2>
+            <button type="button" id="btn-random-popular-searches" class="text-sm text-brand font-semibold hover:underline self-start sm:self-auto">Acak pencarian</button>
+        </div>
+        <div id="popular-search-chips" class="flex flex-wrap gap-2">
+            <a href="cari-properti?q=Rumah&transaksi=dijual&kota=Jakarta%20Selatan" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Rumah Dijual Jakarta Selatan</a>
+            <a href="cari-properti?q=Apartemen&transaksi=disewa&kota=Bandung" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Apartemen Disewa Bandung</a>
+            <a href="cari-properti?q=Tanah&transaksi=dijual&kota=Surabaya" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Tanah Dijual Surabaya</a>
+            <a href="cari-properti?q=Ruko&kota=Tangerang" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Ruko Tangerang</a>
+        </div>
+    </section>
+
+    <!-- Tools strip -->
+    <section class="bg-white border-y border-slate-200 py-10 mb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-xl font-bold text-slate-900 text-center mb-2">Banyak fitur bantu kamu dapat properti impian</h2>
+            <p class="text-slate-500 text-center text-sm mb-8">Simulasi KPR, panduan, dan lainnya</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="kalkulator-kpr" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                    <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">KPR</div>
+                    <span class="text-sm font-semibold text-slate-800">Simulasi KPR</span>
+                </a>
+                <a href="take-over-kpr" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                    <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">%</div>
+                    <span class="text-sm font-semibold text-slate-800">Take Over KPR</span>
+                </a>
+                <a href="tanya-forum" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                    <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">?</div>
+                    <span class="text-sm font-semibold text-slate-800">Tanya forum</span>
+                </a>
+                <a href="panduan-beli" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                    <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">★</div>
+                    <span class="text-sm font-semibold text-slate-800">Panduan beli</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Properti pilihan -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Properti pilihan kami</h2>
+                <p class="text-slate-500 mt-1 text-sm sm:text-base">Rekomendasi properti terbaik beserta informasi lengkapnya.</p>
+            </div>
+            <a href="cari-properti" class="text-brand font-semibold hover:underline shrink-0">Lihat semua →</a>
+        </div>
+
+        <div id="home-featured-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- Properti terpopuler (kartu kompak) -->
+    <section class="bg-white border-t border-slate-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Properti terpopuler</h2>
+            <p class="text-slate-500 mb-8 text-sm">Perumahan dan cluster dengan minat tinggi</p>
+            <div id="home-popular-projects" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+    </section>
+
+    <!-- Kenapa kami -->
+    <section class="py-14 bg-[#f8f9fb]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold text-center text-slate-900 mb-10">Kenapa memilih kami?</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 mb-2">Beli properti aman</h3>
+                    <p class="text-sm text-slate-600 mb-4">Bantu temukan hunian idaman dengan data yang transparan.</p>
+                    <a href="beli-properti-aman" class="text-brand text-sm font-semibold hover:underline">Cari properti →</a>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 mb-2">Listing oleh agen</h3>
+                    <p class="text-sm text-slate-600 mb-4">Pengunggahan properti hanya melalui agen terverifikasi agar informasi tetap akurat dan konsisten.</p>
+                    <a href="cari-agen" class="text-brand text-sm font-semibold hover:underline">Cari agen →</a>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 mb-2">Mitra terpercaya</h3>
+                    <p class="text-sm text-slate-600 mb-4">Agen dan pengembang terverifikasi untuk ketenangan Anda.</p>
+                    <a href="mitra-terpercaya" class="text-brand text-sm font-semibold hover:underline">Pelajari lebih lanjut →</a>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 mb-2">Info KPR lengkap</h3>
+                    <p class="text-sm text-slate-600 mb-4">Simulasi cicilan dan bandingkan bank favorit Anda.</p>
+                    <a href="kalkulator-kpr" class="text-brand text-sm font-semibold hover:underline">Hitung KPR →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+
+    <script src="/agents-data.js"></script>
+    <script src="/listings-data.js"></script>
+    <script src="/listings-user-storage.js"></script>
+    <script>
+    (function () {
+        var grid = document.getElementById('home-featured-grid');
+        var pop = document.getElementById('home-popular-projects');
+        var L = window.LISTINGS;
+        var fmtHome = window.formatListingPriceHome;
+
+        function esc(s) {
+            var d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        function buildWhatsAppHref(p) {
+            var waNumber = String(p.whatsapp || '');
+            if (typeof window.getAgentById === 'function' && p && p.agentId != null) {
+                var agent = window.getAgentById(p.agentId);
+                if (agent && agent.phone) waNumber = String(agent.phone);
+            }
+            var detailPath = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl(p.id) : p.detailUrl;
+            var detailUrl = '';
+            try {
+                detailUrl = new URL(detailPath, window.location.origin).href;
+            } catch (e) {
+                detailUrl = detailPath || '';
+            }
+            var msg = 'permisi, saya tertarik dengan properti ini.\n\nLink detail properti:\n' + detailUrl;
+            return 'https://wa.me/' + encodeURIComponent(waNumber) + '?text=' + encodeURIComponent(msg);
+        }
+
+        if (grid && L && L.length && typeof fmtHome === 'function') {
+        var pinSvg = '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
+
+        L.slice(0, 3).forEach(function (p, idx) {
+            var colSpan = idx === 2 ? ' md:col-span-2 lg:col-span-1' : '';
+            var transBadge = p.transaction === 'dijual'
+                ? '<span class="bg-brand text-white text-xs font-bold px-2.5 py-1 rounded">Dijual</span>'
+                : '<span class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded">Disewa</span>';
+            var negoBadge = p.nego ? '<span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded">Nego</span>' : '';
+            var spec = p.type === 'tanah'
+                ? '<span><strong class="text-slate-800">' + esc(String(p.land)) + '</strong> m² tanah</span><span></span><span></span>'
+                : '<span><strong class="text-slate-800">' + esc(String(p.beds)) + '</strong> KT</span><span><strong class="text-slate-800">' + esc(String(p.baths)) + '</strong> KM</span><span><strong class="text-slate-800">' + esc(String(p.build)) + '</strong> m²</span>';
+            var article = document.createElement('article');
+            article.className = 'bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-lg transition group' + colSpan;
+            article.innerHTML =
+                '<a href="' + esc(typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl(p.id) : p.detailUrl) + '" class="block text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 rounded-t-xl">' +
+                '<div class="relative h-52 overflow-hidden">' +
+                '<img src="' + esc(p.image) + '" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">' +
+                '<div class="absolute top-3 left-3 flex gap-2">' + transBadge + negoBadge + '</div></div>' +
+                '<div class="p-4">' +
+                '<p class="text-xl font-bold text-brand mb-1">' + fmtHome(p) + '</p>' +
+                '<h3 class="font-bold text-slate-900 line-clamp-2 mb-2 group-hover:text-brand transition-colors">' + esc(p.title) + '</h3>' +
+                '<p class="text-slate-500 text-sm flex items-center gap-1 mb-4">' + pinSvg + esc(p.location) + ', ' + esc(p.city) + '</p>' +
+                '<div class="flex justify-between text-sm text-slate-600 border-t border-slate-100 pt-3">' + spec + '</div></div></a>' +
+                '<div class="px-4 pb-4 flex items-center justify-between border-t border-slate-100 pt-3">' +
+                '<span class="text-sm text-slate-600">' + esc(p.agentName) + '</span>' +
+                '<a href="' + esc(buildWhatsAppHref(p)) + '" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-white bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded-lg">WhatsApp</a></div>';
+            grid.appendChild(article);
+        });
+        }
+
+        var projects = window.POPULAR_PROJECTS;
+        if (pop && projects && projects.length) {
+            projects.forEach(function (pr, i) {
+                var a = document.createElement('a');
+                a.href = pr.href || '#';
+                a.className = 'block p-4 rounded-xl border border-slate-200 hover:border-brand/40 hover:shadow-md transition' + (i === 2 ? ' sm:col-span-2 lg:col-span-1' : '');
+                a.innerHTML =
+                    '<h3 class="font-bold text-slate-900">' + esc(pr.title) + '</h3>' +
+                    '<p class="text-sm text-slate-500 mt-1">' + esc(pr.location) + '</p>' +
+                    '<p class="text-sm text-brand font-semibold mt-2">' + esc(pr.line) + '</p>';
+                pop.appendChild(a);
+            });
+        }
+    })();
+
+    (function () {
+        var hidden = document.getElementById('home-trans');
+        var tabs = document.querySelectorAll('.home-trans-tab');
+        if (hidden && tabs.length) {
+            function activateTrans(trans) {
+                hidden.value = trans;
+                tabs.forEach(function (btn) {
+                    var on = btn.getAttribute('data-trans') === trans;
+                    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+                    btn.classList.toggle('tab-active', on);
+                    btn.classList.toggle('tab-inactive', !on);
+                });
+            }
+            tabs.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    activateTrans(btn.getAttribute('data-trans'));
+                });
+            });
+        }
+    })();
+
+    (function () {
+        var btn = document.getElementById('btn-use-location');
+        var label = document.getElementById('btn-use-location-label');
+        var input = document.getElementById('home-search-q');
+        var form = document.getElementById('home-search-form');
+        if (!btn || !input || !form || !label) return;
+
+        function setLoading(on) {
+            btn.disabled = !!on;
+            btn.setAttribute('aria-busy', on ? 'true' : 'false');
+            label.textContent = on ? 'Mencari lokasi…' : 'Gunakan lokasi saat ini';
+        }
+
+        btn.addEventListener('click', function () {
+            if (!navigator.geolocation) {
+                alert('Browser Anda tidak mendukung lokasi (geolocation).');
+                return;
+            }
+            setLoading(true);
+
+            navigator.geolocation.getCurrentPosition(
+                function (pos) {
+                    var lat = pos.coords.latitude;
+                    var lon = pos.coords.longitude;
+                    var url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + encodeURIComponent(lat) + '&longitude=' + encodeURIComponent(lon) + '&localityLanguage=id';
+                    fetch(url)
+                        .then(function (r) {
+                            if (!r.ok) throw new Error('geo');
+                            return r.json();
+                        })
+                        .then(function (data) {
+                            var parts = [];
+                            if (data.locality) parts.push(data.locality);
+                            if (data.city && parts.indexOf(data.city) === -1) parts.push(data.city);
+                            if (!parts.length && data.principalSubdivision) parts.push(data.principalSubdivision);
+                            var q = parts.length ? parts.join(', ') : '';
+                            if (!q) q = lat.toFixed(5) + ', ' + lon.toFixed(5);
+                            input.value = q;
+                            form.submit();
+                        })
+                        .catch(function () {
+                            setLoading(false);
+                            alert('Gagal mengambil nama wilayah. Coba lagi atau isi lokasi secara manual.');
+                        });
+                },
+                function (err) {
+                    setLoading(false);
+                    var msg = 'Tidak dapat mengambil lokasi.';
+                    if (err && err.code === 1) msg = 'Izin lokasi ditolak. Aktifkan di pengaturan browser.';
+                    else if (err && err.code === 2) msg = 'Posisi tidak tersedia.';
+                    else if (err && err.code === 3) msg = 'Permintaan lokasi habis waktu. Coba lagi.';
+                    alert(msg);
+                },
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 120000 }
+            );
+        });
+    })();
+
+    (function () {
+        var chipsWrap = document.getElementById('popular-search-chips');
+        var randomBtn = document.getElementById('btn-random-popular-searches');
+        var listings = Array.isArray(window.LISTINGS) ? window.LISTINGS.slice() : [];
+        if (!chipsWrap || !randomBtn || !listings.length) return;
+
+        function esc(s) {
+            var d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        function cap(s) {
+            if (!s) return '';
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
+        function toTypeLabel(type) {
+            if (typeof window.typeLabel === 'function') return window.typeLabel(type);
+            return cap(type || '');
+        }
+
+        function toTransLabel(trans) {
+            return trans === 'disewa' ? 'Disewa' : 'Dijual';
+        }
+
+        function buildHref(item) {
+            var params = new URLSearchParams();
+            if (item.query) params.set('q', item.query);
+            if (item.city) params.set('kota', item.city);
+            if (item.transaction) params.set('transaksi', item.transaction);
+            if (item.type) params.append('tipe', item.type);
+            return 'cari-properti?' + params.toString();
+        }
+
+        function shuffle(arr) {
+            var a = arr.slice();
+            for (var i = a.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var tmp = a[i];
+                a[i] = a[j];
+                a[j] = tmp;
+            }
+            return a;
+        }
+
+        function createSearchPool() {
+            var seen = {};
+            var out = [];
+            listings.forEach(function (p) {
+                if (!p || !p.type || !p.city) return;
+                var label = toTypeLabel(p.type) + ' ' + toTransLabel(p.transaction) + ' ' + p.city;
+                var key = [p.type, p.transaction || '', p.city].join('|').toLowerCase();
+                if (seen[key]) return;
+                seen[key] = true;
+                out.push({
+                    label: label,
+                    query: toTypeLabel(p.type),
+                    city: p.city,
+                    transaction: p.transaction || '',
+                    type: p.type
+                });
+            });
+            return out;
+        }
+
+        var searchPool = createSearchPool();
+        if (!searchPool.length) return;
+
+        function renderRandomSearches() {
+            var picks = shuffle(searchPool).slice(0, 6);
+            chipsWrap.innerHTML = picks.map(function (item) {
+                return '<a href="' + esc(buildHref(item)) + '" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">' + esc(item.label) + '</a>';
+            }).join('');
+        }
+
+        randomBtn.addEventListener('click', renderRandomSearches);
+        renderRandomSearches();
+    })();
+    </script>
+
+</body>
+</html>

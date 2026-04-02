@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Properti | Dunia Rumah Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' },
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        #map { min-height: 50vh; }
+        @media (min-width: 1024px) {
+            #map { min-height: calc(100vh - 11rem); }
+        }
+        .leaflet-container img.leaflet-tile,
+        .leaflet-container .leaflet-marker-icon img {
+            max-width: none !important;
+        }
+        .leaflet-container { font-family: inherit; }
+        .map-card-active { ring: 2px solid #E02020; }
+    </style>
+</head>
+<body class="bg-[#f5f5f5] text-slate-800 antialiased">
+
+    <div data-navbar-host data-navbar-active="peta-properti"></div>
+
+    <div class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Jelajahi properti di peta</h1>
+            <p class="text-slate-500 text-sm mt-1">Klik penanda untuk detail singkat, atau pilih kota untuk menyaring tampilan.</p>
+            <div class="mt-4 flex flex-wrap items-center gap-3">
+                <label for="filter-city" class="text-sm font-medium text-slate-600">Kota / wilayah</label>
+                <select id="filter-city" class="py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none min-w-[200px]">
+                    <option value="">Semua kota</option>
+                    <option value="Jakarta Selatan">Jakarta Selatan</option>
+                    <option value="Jakarta Timur">Jakarta Timur</option>
+                    <option value="Jakarta Utara">Jakarta Utara</option>
+                    <option value="Bandung">Bandung</option>
+                    <option value="Surabaya">Surabaya</option>
+                    <option value="Tangerang">Tangerang</option>
+                    <option value="Cianjur">Cianjur</option>
+                </select>
+                <a href="cari-properti" class="text-sm font-semibold text-brand hover:underline">Tampilan daftar →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row lg:items-stretch max-w-[1920px] mx-auto">
+        <div id="map" class="flex-1 min-h-[50vh] lg:min-h-0 border-b lg:border-b-0 lg:border-r border-slate-200 z-0"></div>
+        <aside class="w-full lg:w-[380px] shrink-0 bg-white lg:max-h-[calc(100vh-11rem)] lg:overflow-y-auto border-slate-200">
+            <div class="p-4 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <p class="text-sm text-slate-600"><span id="result-count" class="font-bold text-slate-900">0</span> properti di peta</p>
+            </div>
+            <ul id="map-list" class="divide-y divide-slate-100"></ul>
+        </aside>
+    </div>
+
+    <div data-footer-host></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="/listings-data.js"></script>
+    <script src="/listings-user-storage.js"></script>
+    <script>
+(function () {
+    var LISTINGS = window.LISTINGS;
+    var formatPrice = window.formatListingPrice;
+    if (!LISTINGS || !LISTINGS.length || typeof formatPrice !== 'function') return;
+    var detailUrl = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl : function (id) { return 'properti-detail?id=' + encodeURIComponent(id); };
+
+    function iconFor(p) {
+        var color = p.transaction === 'dijual' ? '#E02020' : '#059669';
+        return L.divIcon({
+            className: 'leaflet-marker-icon leaflet-div-icon',
+            html: '<div style="width:14px;height:14px;background:' + color + ';border:2px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+        });
+    }
+
+    var map = L.map('map', { scrollWheelZoom: true }).setView([-2.5, 118], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    var markers = [];
+    var layerGroup = L.layerGroup().addTo(map);
+    var listEl = document.getElementById('map-list');
+    var countEl = document.getElementById('result-count');
+    var filterSel = document.getElementById('filter-city');
+
+    function renderList(items) {
+        listEl.innerHTML = '';
+        countEl.textContent = String(items.length);
+        items.forEach(function (p) {
+            var li = document.createElement('li');
+            li.id = 'map-card-' + p.id;
+            li.className = 'map-card p-4 hover:bg-slate-50 transition cursor-pointer';
+            var badge = p.transaction === 'dijual'
+                ? '<span class="bg-brand text-white text-xs font-bold px-2 py-0.5 rounded">Dijual</span>'
+                : '<span class="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded">Disewa</span>';
+            li.innerHTML =
+                '<div class="flex gap-3">' +
+                '<div class="min-w-0 flex-1">' +
+                '<div class="flex flex-wrap gap-2 mb-1">' + badge + '</div>' +
+                '<p class="font-bold text-slate-900 text-sm leading-snug line-clamp-2">' + escapeHtml(p.title) + '</p>' +
+                '<p class="text-slate-500 text-xs mt-1">' + escapeHtml(p.location) + ', ' + escapeHtml(p.city) + '</p>' +
+                '<p class="text-brand font-bold text-sm mt-2">' + formatPrice(p) + '</p>' +
+                '<a href="' + escapeAttr(detailUrl(p.id)) + '" class="inline-block mt-2 text-xs font-semibold text-brand hover:underline">Detail →</a>' +
+                '</div></div>';
+            li.addEventListener('click', function (e) {
+                if (e.target.closest('a')) return;
+                map.setView([p.lat, p.lng], Math.max(map.getZoom(), 14), { animate: true });
+                var m = markers.find(function (x) { return x.p.id === p.id; });
+                if (m) m.marker.openPopup();
+            });
+            listEl.appendChild(li);
+        });
+    }
+
+    function escapeHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+    function escapeAttr(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    }
+
+    function highlightCard(id) {
+        document.querySelectorAll('.map-card').forEach(function (el) {
+            el.classList.remove('ring-2', 'ring-brand', 'bg-brand-light');
+        });
+        var c = document.getElementById('map-card-' + id);
+        if (c) {
+            c.classList.add('ring-2', 'ring-brand', 'bg-brand-light');
+            c.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+    }
+
+    function buildMarkers(items) {
+        layerGroup.clearLayers();
+        markers = [];
+        var bounds = [];
+        items.forEach(function (p) {
+            var m = L.marker([p.lat, p.lng], { icon: iconFor(p) }).addTo(layerGroup);
+            var popupHtml =
+                '<div class="text-sm min-w-[200px]">' +
+                '<p class="font-bold text-slate-900 mb-1">' + escapeHtml(p.title) + '</p>' +
+                '<p class="text-slate-500 text-xs mb-2">' + escapeHtml(p.location) + ', ' + escapeHtml(p.city) + '</p>' +
+                '<p class="text-brand font-bold mb-2">' + formatPrice(p) + '</p>' +
+                '<a href="' + escapeAttr(detailUrl(p.id)) + '" class="text-brand font-semibold hover:underline">Lihat detail</a>' +
+                '</div>';
+            m.bindPopup(popupHtml);
+            m.on('click', function () { highlightCard(p.id); });
+            markers.push({ p: p, marker: m });
+            bounds.push([p.lat, p.lng]);
+        });
+        if (bounds.length) {
+            map.fitBounds(bounds, { padding: [48, 48], maxZoom: 12 });
+        }
+    }
+
+    function applyFilter() {
+        var city = filterSel.value;
+        var items = city ? LISTINGS.filter(function (p) { return p.city === city; }) : LISTINGS.slice();
+        renderList(items);
+        buildMarkers(items);
+    }
+
+    filterSel.addEventListener('change', applyFilter);
+    applyFilter();
+})();
+    </script>
+    <script type="module" src="/src/navbar.js"></script>
+    <script type="module" src="/src/footer.js"></script>
+</body>
+</html>

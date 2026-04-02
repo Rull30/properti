@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Kalkulator KPR | Rumah123</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' } },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+</head>
+<body class="bg-[#f5f5f5] text-slate-800 antialiased">
+
+
+    <div data-navbar-host data-navbar-active="kalkulator-kpr"></div>
+
+    <div class="bg-white border-b border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <nav class="text-sm text-slate-500">
+                <a href="/" class="hover:text-brand">Beranda</a>
+                <span class="mx-2 text-slate-300">/</span>
+                <span class="text-slate-800 font-medium">Simulasi KPR</span>
+            </nav>
+        </div>
+    </div>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Simulasi KPR</h1>
+        <p class="text-slate-600 text-sm sm:text-base mb-8">Hitung estimasi cicilan tetap per bulan berdasarkan harga rumah, uang muka, suku bunga, dan tenor. Menggunakan rumus angsuran jenis <strong>anuitas</strong> (cicilan pokok + bunga sama setiap bulan).</p>
+
+        <div class="grid lg:grid-cols-5 gap-8">
+            <div class="lg:col-span-3 space-y-5">
+                <form id="kpr-form" class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5" action="#" method="post">
+                    <div>
+                        <label for="harga" class="block text-sm font-semibold text-slate-900 mb-1">Harga properti</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
+                            <input type="text" inputmode="numeric" id="harga" autocomplete="off" value="" class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none tabular-nums" placeholder="0" data-default-harga="750000000">
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Nominal diformat otomatis (ribuan pakai titik). Klik field untuk mengedit angka.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-baseline mb-2">
+                            <label for="dp-pct" class="text-sm font-semibold text-slate-900">Uang muka (DP)</label>
+                            <span id="dp-pct-label" class="text-sm font-bold text-brand">20%</span>
+                        </div>
+                        <input type="range" id="dp-pct" min="0" max="90" value="20" step="1" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand">
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>0%</span>
+                            <span>90%</span>
+                        </div>
+                        <p class="text-sm text-slate-600 mt-2">Nominal DP: <strong id="dp-nominal" class="text-slate-900">—</strong></p>
+                    </div>
+
+                    <div>
+                        <label for="bunga" class="block text-sm font-semibold text-slate-900 mb-1">Suku bunga tetap per tahun</label>
+                        <div class="flex items-center gap-3">
+                            <input type="number" id="bunga" min="0" max="30" step="0.1" value="7.5" class="w-28 py-3 px-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none">
+                            <span class="text-slate-600">% p.a.</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Bunga efektif tahunan (contoh bank umum 6%–9%)</p>
+                    </div>
+
+                    <div>
+                        <label for="tenor" class="block text-sm font-semibold text-slate-900 mb-1">Jangka waktu kredit</label>
+                        <select id="tenor" class="w-full py-3 px-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none bg-white">
+                            <option value="5">5 tahun</option>
+                            <option value="10">10 tahun</option>
+                            <option value="15" selected>15 tahun</option>
+                            <option value="20">20 tahun</option>
+                            <option value="25">25 tahun</option>
+                            <option value="30">30 tahun</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="btn-hitung" class="w-full sm:w-auto bg-brand hover:bg-brand-dark active:scale-[0.98] text-white font-bold py-3 px-8 rounded-xl shadow-md transition focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2">Hitung ulang</button>
+                </form>
+
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-sm text-amber-900">
+                    <strong>Catatan:</strong> Hasil simulasi bersifat indikatif. Bank dapat menggunakan metode perhitungan, biaya provisi, asuransi, dan suku bunga yang berbeda. Konfirmasi ke bank pilihan Anda sebelum mengambil keputusan.
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-4" id="hasil-panel" aria-live="polite">
+                <div class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm border-t-4 border-t-brand">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Estimasi cicilan per bulan</p>
+                    <p id="out-cicilan" class="text-2xl sm:text-3xl font-bold text-brand break-words">—</p>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3 text-sm">
+                    <div class="flex justify-between gap-2 border-b border-slate-100 pb-2">
+                        <span class="text-slate-500">Pokok pinjaman</span>
+                        <span id="out-pokok" class="font-semibold text-slate-900 text-right">—</span>
+                    </div>
+                    <div class="flex justify-between gap-2 border-b border-slate-100 pb-2">
+                        <span class="text-slate-500">Total angsuran</span>
+                        <span id="out-total" class="font-semibold text-slate-900 text-right">—</span>
+                    </div>
+                    <div class="flex justify-between gap-2">
+                        <span class="text-slate-500">Estimasi total bunga</span>
+                        <span id="out-bunga-total" class="font-semibold text-slate-900 text-right">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="mt-10">
+            <button type="button" id="btn-toggle-table" class="flex items-center gap-2 text-sm font-semibold text-brand hover:underline mb-3">
+                <span id="table-toggle-text">Tampilkan rincian angsuran (12 bulan pertama)</span>
+                <svg id="table-chevron" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="table-wrap" class="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-slate-50 text-slate-600 text-left">
+                        <tr>
+                            <th class="px-4 py-3 font-semibold">Bulan</th>
+                            <th class="px-4 py-3 font-semibold text-right">Cicilan</th>
+                            <th class="px-4 py-3 font-semibold text-right">Bunga</th>
+                            <th class="px-4 py-3 font-semibold text-right">Pokok</th>
+                            <th class="px-4 py-3 font-semibold text-right">Sisa pokok</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amort-body" class="divide-y divide-slate-100 text-slate-800"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div data-footer-host></div>
+
+    <script>
+(function () {
+    /** Angka Indonesia: titik ribuan, koma desimal */
+    function parseAngkaInput(str) {
+        if (str == null || String(str).trim() === '') return 0;
+        var s = String(str).trim().replace(/\s/g, '');
+        if (s.indexOf(',') !== -1) {
+            s = s.replace(/\./g, '').replace(',', '.');
+        } else {
+            s = s.replace(/\./g, '');
+        }
+        var n = parseFloat(s);
+        return isNaN(n) ? 0 : n;
+    }
+
+    /** Tampilan integer dengan pemisah ribuan (id-ID), tanpa desimal */
+    function formatIntegerId(n) {
+        if (n == null || isNaN(n) || n <= 0) return '';
+        return Math.round(n).toLocaleString('id-ID');
+    }
+
+    function formatRp(n) {
+        if (n == null || isNaN(n)) return '—';
+        var v = Math.round(n);
+        return 'Rp ' + v.toLocaleString('id-ID');
+    }
+
+    function getHargaEl() {
+        return document.getElementById('harga');
+    }
+
+    /** Saat blur / setelah hitung: tampilkan 750.000.000 */
+    function applyHargaFormatted() {
+        var el = getHargaEl();
+        if (!el) return;
+        var n = parseAngkaInput(el.value);
+        el.value = formatIntegerId(n);
+    }
+
+    /** Saat fokus: tanpa titik agar mudah diganti */
+    function applyHargaPlainForEdit() {
+        var el = getHargaEl();
+        if (!el) return;
+        var n = parseAngkaInput(el.value);
+        el.value = n > 0 ? String(Math.round(n)) : '';
+    }
+
+    /** Cicilan bulanan tetap (anuitas). principal > 0, annualRatePercent >= 0, years > 0 */
+    function monthlyInstallment(principal, annualRatePercent, years) {
+        var n = Math.round(years * 12);
+        if (principal <= 0 || n <= 0) return 0;
+        var r = (annualRatePercent / 100) / 12;
+        if (r === 0) return principal / n;
+        var pow = Math.pow(1 + r, n);
+        return principal * (r * pow) / (pow - 1);
+    }
+
+    function buildAmortization(principal, annualRatePercent, years, maxRows) {
+        var monthly = monthlyInstallment(principal, annualRatePercent, years);
+        var n = Math.round(years * 12);
+        var r = (annualRatePercent / 100) / 12;
+        var remaining = principal;
+        var rows = [];
+        var limit = Math.min(n, maxRows || 12);
+        for (var i = 1; i <= limit; i++) {
+            var interest = remaining * r;
+            var pokok = monthly - interest;
+            remaining -= pokok;
+            if (remaining < 0) remaining = 0;
+            rows.push({ bulan: i, cicilan: monthly, bunga: interest, pokok: pokok, sisa: remaining });
+        }
+        return rows;
+    }
+
+    function compute() {
+        var harga = parseAngkaInput(document.getElementById('harga').value);
+        var dpPct = parseFloat(document.getElementById('dp-pct').value) || 0;
+        var bungaStr = String(document.getElementById('bunga').value).trim().replace(/\s/g, '').replace(',', '.');
+        var bunga = parseFloat(bungaStr);
+        if (isNaN(bunga)) bunga = 0;
+        var tenor = parseFloat(document.getElementById('tenor').value) || 15;
+
+        document.getElementById('dp-pct-label').textContent = Math.round(dpPct) + '%';
+
+        var dpNominal = harga * (dpPct / 100);
+        var pokok = Math.max(0, harga - dpNominal);
+        document.getElementById('dp-nominal').textContent = formatRp(dpNominal);
+
+        if (pokok <= 0) {
+            document.getElementById('out-cicilan').textContent = 'Rp 0';
+            document.getElementById('out-pokok').textContent = formatRp(0);
+            document.getElementById('out-total').textContent = formatRp(0);
+            document.getElementById('out-bunga-total').textContent = formatRp(0);
+            document.getElementById('amort-body').innerHTML = '';
+            return;
+        }
+
+        var cicilan = monthlyInstallment(pokok, bunga, tenor);
+        var bulan = Math.round(tenor * 12);
+        var totalAngsuran = cicilan * bulan;
+        var totalBunga = totalAngsuran - pokok;
+
+        document.getElementById('out-cicilan').textContent = formatRp(cicilan);
+        document.getElementById('out-pokok').textContent = formatRp(pokok);
+        document.getElementById('out-total').textContent = formatRp(totalAngsuran);
+        document.getElementById('out-bunga-total').textContent = formatRp(totalBunga);
+
+        var rows = buildAmortization(pokok, bunga, tenor, 12);
+        var tb = document.getElementById('amort-body');
+        tb.innerHTML = '';
+        rows.forEach(function (row) {
+            var tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50/80';
+            tr.innerHTML =
+                '<td class="px-4 py-2.5">' + row.bulan + '</td>' +
+                '<td class="px-4 py-2.5 text-right tabular-nums">' + formatRp(row.cicilan) + '</td>' +
+                '<td class="px-4 py-2.5 text-right tabular-nums text-slate-500">' + formatRp(row.bunga) + '</td>' +
+                '<td class="px-4 py-2.5 text-right tabular-nums">' + formatRp(row.pokok) + '</td>' +
+                '<td class="px-4 py-2.5 text-right tabular-nums text-slate-600">' + formatRp(row.sisa) + '</td>';
+            tb.appendChild(tr);
+        });
+    }
+
+    var debounce;
+    function schedule() {
+        clearTimeout(debounce);
+        debounce = setTimeout(compute, 120);
+    }
+
+    function init() {
+        var form = document.getElementById('kpr-form');
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            applyHargaFormatted();
+            compute();
+            applyHargaFormatted();
+            var panel = document.getElementById('hasil-panel');
+            if (panel && window.matchMedia('(max-width: 1023px)').matches) {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            var btn = document.getElementById('btn-hitung');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Menghitung…';
+                setTimeout(function () {
+                    btn.disabled = false;
+                    btn.textContent = 'Hitung ulang';
+                }, 200);
+            }
+        });
+
+        var hargaEl = getHargaEl();
+        if (hargaEl) {
+            var def = hargaEl.getAttribute('data-default-harga');
+            var initial = def ? parseAngkaInput(def) : 750000000;
+            hargaEl.value = formatIntegerId(initial);
+
+            hargaEl.addEventListener('focus', applyHargaPlainForEdit);
+            hargaEl.addEventListener('blur', function () {
+                applyHargaFormatted();
+                compute();
+            });
+            hargaEl.addEventListener('input', schedule);
+        }
+
+        ['bunga', 'tenor'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('input', schedule);
+            el.addEventListener('change', compute);
+        });
+        document.getElementById('dp-pct').addEventListener('input', schedule);
+        document.getElementById('dp-pct').addEventListener('change', compute);
+
+        var tableOpen = false;
+        document.getElementById('btn-toggle-table').addEventListener('click', function () {
+            tableOpen = !tableOpen;
+            var wrap = document.getElementById('table-wrap');
+            var chev = document.getElementById('table-chevron');
+            var txt = document.getElementById('table-toggle-text');
+            wrap.classList.toggle('hidden', !tableOpen);
+            chev.style.transform = tableOpen ? 'rotate(180deg)' : '';
+            txt.textContent = tableOpen ? 'Sembunyikan rincian angsuran' : 'Tampilkan rincian angsuran (12 bulan pertama)';
+        });
+
+        compute();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+    </script>
+    <script type="module" src="/src/navbar.js"></script>
+    <script type="module" src="/src/footer.js"></script>
+</body>
+</html>
