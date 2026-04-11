@@ -20,13 +20,14 @@
         };
     </script>
     <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
-    <script src="auth.js"></script>
+    <script src="/agent/auth.js"></script>
 </head>
 <body class="bg-[#f0f2f5] text-slate-800 min-h-screen antialiased">
     <script>
-        (function () {
-            if (typeof AgentAuth === 'undefined') { window.location.href = 'login.html'; return; }
-            if (!AgentAuth.isLoggedIn()) { window.location.href = 'login.html'; }
+        (async function () {
+            if (typeof AgentAuth === 'undefined') { window.location.href = '/agent/login'; return; }
+            var ok = await AgentAuth.guard('/agent/login');
+            if (!ok) return;
         })();
     </script>
 
@@ -40,10 +41,10 @@
                 <p class="text-xs text-slate-500 mt-1">Panel agen</p>
             </div>
             <nav class="flex-1 p-3 space-y-1">
-                <a href="dashboard" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Dashboard</a>
-                <a href="listing-saya" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Listing saya</a>
-                <a href="pesan" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Pesan</a>
-                <a href="profil" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Profil</a>
+                <a href="/agent/dashboard" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Dashboard</a>
+                <a href="/agent/listing-saya" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Listing saya</a>
+                <a href="/agent/pesan" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Pesan</a>
+                <a href="/agent/profil" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Profil</a>
             </nav>
             <div class="p-3 border-t border-slate-700/80">
                 <a href="/" class="block text-xs text-slate-500 hover:text-white px-3 py-2">← Situs publik</a>
@@ -64,10 +65,10 @@
                     </div>
                 </div>
                 <nav class="md:hidden mt-4 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 text-sm">
-                    <a href="dashboard" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Dashboard</a>
-                    <a href="listing-saya" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Listing</a>
-                    <a href="pesan" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Pesan</a>
-                    <a href="profil" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Profil</a>
+                    <a href="/agent/dashboard" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Dashboard</a>
+                    <a href="/agent/listing-saya" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Listing</a>
+                    <a href="/agent/pesan" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Pesan</a>
+                    <a href="/agent/profil" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Profil</a>
                 </nav>
             </header>
 
@@ -112,9 +113,9 @@
         list.appendChild(a);
     });
 
-    function doLogout() {
-        AgentAuth.logout();
-        window.location.href = 'login.html';
+    async function doLogout() {
+        await AgentAuth.logout();
+        window.location.href = '/agent/login';
     }
     document.getElementById('btn-logout').addEventListener('click', doLogout);
     document.getElementById('btn-logout-mobile').addEventListener('click', doLogout);

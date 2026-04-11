@@ -7,16 +7,172 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Province {
+  id       String    @id @db.VarChar(10)
+  name     String    @db.VarChar(120)
+  regencies Regency[]
+  listings Listing[]
+}
+
+model Regency {
+  id         String     @id @db.VarChar(10)
+  provinceId String     @db.VarChar(10)
+  province   Province   @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+  name       String     @db.VarChar(120)
+  districts  District[]
+  listings   Listing[]
+
+  @@index([provinceId])
+}
+
+model District {
+  id        String   @id @db.VarChar(15)
+  regencyId String   @db.VarChar(10)
+  regency   Regency  @relation(fields: [regencyId], references: [id], onDelete: Cascade)
+  name      String   @db.VarChar(120)
+  listings  Listing[]
+
+  @@index([regencyId])
+}
+
 model Listing {
-  id        String   @id @db.VarChar(64)
-  payload   Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String               @id @db.VarChar(64)
+  title           String               @db.VarChar(255)
+  transaction     String               @db.VarChar(50)
+  type            String               @db.VarChar(50)
+  city            String               @db.VarChar(100)
+  location        String               @db.VarChar(120)
+  priceJuta       Float
+  beds            Int                  @default(0)
+  baths           Int                  @default(0)
+  land            Int                  @default(0)
+  build           Int                  @default(0)
+  cert            String               @db.VarChar(100)
+  nego            Boolean              @default(false)
+  date            String               @db.VarChar(20)
+  newProperty     Boolean              @default(false)
+  lat             Float?
+  lng             Float?
+  locationRadiusM Int?
+  agentId         String?              @db.VarChar(64)
+  whatsapp        String               @db.VarChar(50)
+  listingCode     String               @db.VarChar(100)
+  installmentHint String               @db.VarChar(255)
+  address         String               @db.VarChar(255)
+  floors          Int                  @default(0)
+  electricity     String               @db.VarChar(50)
+  facing          String               @db.VarChar(100)
+  image           String               @db.VarChar(500)
+  detailUrl       String               @db.VarChar(255)
+  provinceId      String?              @db.VarChar(10)
+  regencyId       String?              @db.VarChar(10)
+  districtId      String?              @db.VarChar(15)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  agent           Agent?               @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  province        Province?            @relation(fields: [provinceId], references: [id], onDelete: SetNull)
+  regency         Regency?             @relation(fields: [regencyId], references: [id], onDelete: SetNull)
+  district        District?            @relation(fields: [districtId], references: [id], onDelete: SetNull)
+  images          ListingImage[]
+  descriptions    ListingDescription[]
+  facilities      ListingFacility[]
+
+  @@index([agentId])
+  @@index([listingCode])
+  @@index([provinceId])
+  @@index([regencyId])
+  @@index([districtId])
 }
 
 model Agent {
-  id        String   @id @db.VarChar(64)
-  payload   Json
+  id             String                @id @db.VarChar(64)
+  name           String                @db.VarChar(120)
+  agency         String                @db.VarChar(150)
+  city           String                @db.VarChar(100)
+  email          String                @unique @db.VarChar(150)
+  passwordHash   String?               @db.VarChar(255)
+  listingCount   Int                   @default(0)
+  yearsExp       Int                   @default(0)
+  verified       Boolean               @default(false)
+  rating         Float                 @default(0)
+  reviewCount    Int                   @default(0)
+  phone          String                @db.VarChar(50)
+  bio            String                @db.VarChar(1000)
+  joinDate       String                @db.VarChar(20)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  areas          AgentArea[]
+  specialties    AgentSpecialty[]
+  listings       AgentProfileListing[]
+  managedListing Listing[]
+}
+
+model ListingImage {
+  id        Int      @id @default(autoincrement())
+  listingId String   @db.VarChar(64)
+  imageUrl  String   @db.VarChar(500)
+  sortOrder Int      @default(0)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  @@index([listingId])
+}
+
+model ListingDescription {
+  id        Int      @id @default(autoincrement())
+  listingId String   @db.VarChar(64)
+  content   String   @db.VarChar(1200)
+  sortOrder Int      @default(0)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+}
+
+model ListingFacility {
+  id        Int      @id @default(autoincrement())
+  listingId String   @db.VarChar(64)
+  content   String   @db.VarChar(255)
+  sortOrder Int      @default(0)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+}
+
+model AgentArea {
+  id        Int      @id @default(autoincrement())
+  agentId   String   @db.VarChar(64)
+  content   String   @db.VarChar(120)
+  sortOrder Int      @default(0)
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([agentId])
+}
+
+model AgentSpecialty {
+  id        Int      @id @default(autoincrement())
+  agentId   String   @db.VarChar(64)
+  content   String   @db.VarChar(120)
+  sortOrder Int      @default(0)
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([agentId])
+}
+
+model AgentProfileListing {
+  id        Int      @id @default(autoincrement())
+  agentId   String   @db.VarChar(64)
+  title     String   @db.VarChar(255)
+  price     String   @db.VarChar(120)
+  loc       String   @db.VarChar(150)
+  img       String   @db.VarChar(500)
+  url       String   @db.VarChar(255)
+  sortOrder Int      @default(0)
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([agentId])
 }

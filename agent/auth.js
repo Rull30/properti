@@ -1,40 +1,69 @@
 /**
- * Autentikasi agen (demo, sessionStorage).
- * Tidak ada backend — hanya untuk alur UI.
+ * Autentikasi agen via session server (cookie).
  */
 (function (w) {
-    var SESSION_KEY = 'rumah123_agent_ok';
-    var EMAIL_KEY = 'rumah123_agent_email';
-    var NAME_KEY = 'rumah123_agent_name';
+  w.AgentAuth = {
+    me: null,
 
-    w.AgentAuth = {
-        isLoggedIn: function () {
-            return w.sessionStorage.getItem(SESSION_KEY) === '1';
-        },
-        getEmail: function () {
-            return w.sessionStorage.getItem(EMAIL_KEY) || '';
-        },
-        getName: function () {
-            return w.sessionStorage.getItem(NAME_KEY) || 'Agen';
-        },
-        login: function (email, displayName) {
-            w.sessionStorage.setItem(SESSION_KEY, '1');
-            w.sessionStorage.setItem(EMAIL_KEY, email || '');
-            w.sessionStorage.setItem(NAME_KEY, displayName || 'Agen');
-        },
-        logout: function () {
-            w.sessionStorage.removeItem(SESSION_KEY);
-            w.sessionStorage.removeItem(EMAIL_KEY);
-            w.sessionStorage.removeItem(NAME_KEY);
-        },
-        /** Redirect ke login jika belum masuk. Return true jika boleh lanjut. */
-        guard: function (loginPath) {
-            loginPath = loginPath || 'login.html';
-            if (!this.isLoggedIn()) {
-                w.location.href = loginPath;
-                return false;
-            }
-            return true;
+    async refresh() {
+      try {
+        const r = await fetch('/api/agent/me', { credentials: 'same-origin' });
+        if (!r.ok) {
+          this.me = null;
+          return false;
         }
-    };
+        const data = await r.json();
+        this.me = data.agent || null;
+        return true;
+      } catch (e) {
+        this.me = null;
+        return false;
+      }
+    },
+
+    isLoggedIn: function () {
+      return !!this.me;
+    },
+
+    getEmail: function () {
+      return (this.me && this.me.email) || '';
+    },
+
+    getName: function () {
+      return (this.me && this.me.name) || 'Agen';
+    },
+
+    getId: function () {
+      return (this.me && this.me.id) || '';
+    },
+
+    login: async function (email, password) {
+      const r = await fetch('/api/agent/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ email: email, password: password }),
+      });
+      if (!r.ok) return false;
+      await this.refresh();
+      return true;
+    },
+
+    logout: async function () {
+      try {
+        await fetch('/api/agent/auth/logout', { method: 'POST', credentials: 'same-origin' });
+      } catch (e) {}
+      this.me = null;
+    },
+
+    guard: async function (loginPath) {
+      loginPath = loginPath || '/agent/login';
+      const ok = await this.refresh();
+      if (!ok) {
+        w.location.href = loginPath;
+        return false;
+      }
+      return true;
+    },
+  };
 })(window);

@@ -20,15 +20,14 @@
         };
     </script>
     <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
-    <script src="auth.js"></script>
-    <script src="../listings-data.js"></script>
-    <script src="../listings-user-storage.js"></script>
+    <script src="/agent/auth.js"></script>
 </head>
 <body class="bg-[#f0f2f5] text-slate-800 min-h-screen antialiased">
     <script>
-        (function () {
-            if (typeof AgentAuth === 'undefined') { window.location.href = 'login.html'; return; }
-            if (!AgentAuth.isLoggedIn()) { window.location.href = 'login.html'; }
+        (async function () {
+            if (typeof AgentAuth === 'undefined') { window.location.href = '/agent/login'; return; }
+            var ok = await AgentAuth.guard('/agent/login');
+            if (!ok) return;
         })();
     </script>
 
@@ -42,10 +41,10 @@
                 <p class="text-xs text-slate-500 mt-1">Panel agen</p>
             </div>
             <nav class="flex-1 p-3 space-y-1">
-                <a href="dashboard" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Dashboard</a>
-                <a href="listing-saya" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Listing saya</a>
-                <a href="pesan" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Pesan</a>
-                <a href="profil" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Profil</a>
+                <a href="/agent/dashboard" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Dashboard</a>
+                <a href="/agent/listing-saya" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Listing saya</a>
+                <a href="/agent/pesan" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Pesan</a>
+                <a href="/agent/profil" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Profil</a>
             </nav>
             <div class="p-3 border-t border-slate-700/80">
                 <a href="/" class="block text-xs text-slate-500 hover:text-white px-3 py-2">← Situs publik</a>
@@ -58,7 +57,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h1 class="text-lg sm:text-xl font-bold text-slate-900">Listing saya</h1>
-                        <p class="text-sm text-slate-500">Kelola iklan properti yang Anda pasang</p>
+                        <p class="text-sm text-slate-500">Hanya listing milik akun Anda</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="agent-badge" class="hidden sm:inline text-sm text-slate-600 truncate max-w-[200px]"></span>
@@ -66,10 +65,10 @@
                     </div>
                 </div>
                 <nav class="md:hidden mt-4 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 text-sm">
-                    <a href="dashboard" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Dashboard</a>
-                    <a href="listing-saya" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Listing</a>
-                    <a href="pesan" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Pesan</a>
-                    <a href="profil" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Profil</a>
+                    <a href="/agent/dashboard" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Dashboard</a>
+                    <a href="/agent/listing-saya" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Listing</a>
+                    <a href="/agent/pesan" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Pesan</a>
+                    <a href="/agent/profil" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Profil</a>
                 </nav>
             </header>
 
@@ -81,7 +80,7 @@
                         <button type="button" data-filter="tayang" class="filter-tab px-4 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200 text-slate-700 hover:border-brand/40">Tayang</button>
                         <button type="button" data-filter="draft" class="filter-tab px-4 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200 text-slate-700 hover:border-brand/40">Draft</button>
                     </div>
-                    <a href="listing-form" class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition">
+                    <a href="/agent/listing-form" class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition">
                         + Listing baru
                     </a>
                 </div>
@@ -94,14 +93,14 @@
                                     <th class="px-4 py-3 font-semibold">Properti</th>
                                     <th class="px-4 py-3 font-semibold">Harga</th>
                                     <th class="px-4 py-3 font-semibold">Status</th>
-                                    <th class="px-4 py-3 font-semibold">Tayangan</th>
+                                    <th class="px-4 py-3 font-semibold">Wilayah</th>
                                     <th class="px-4 py-3 font-semibold text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="listing-body" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
-                    <p id="listing-empty" class="hidden px-4 py-10 text-center text-slate-500 text-sm">Tidak ada listing pada filter ini.</p>
+                    <p id="listing-empty" class="hidden px-4 py-10 text-center text-slate-500 text-sm">Belum ada listing.</p>
                 </div>
             </main>
         </div>
@@ -109,10 +108,7 @@
 
     <script>
 (function () {
-    if (!AgentAuth.isLoggedIn()) return;
-    document.getElementById('agent-badge').textContent = AgentAuth.getEmail();
-
-    if (!window.LISTINGS || !window.formatListingPrice) return;
+    var LIST = [];
 
     function badgeStatus(s) {
         if (s === 'draft') return '<span class="inline-flex px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-600">Draft</span>';
@@ -148,19 +144,18 @@
         var body = document.getElementById('listing-body');
         var empty = document.getElementById('listing-empty');
         body.innerHTML = '';
-        var list = window.LISTINGS.map(function (p) {
+        var list = LIST.map(function (p) {
             var n = parseInt(p.id, 10);
-            var views = 80 + (isNaN(n) ? 0 : n) * 37;
             var status = p.priceJuta > 0 ? 'tayang' : 'draft';
             var filt = status === 'draft' ? 'draft' : (status === 'tayang' ? 'tayang' : 'aktif');
+            var wilayah = [p.regencyName || p.city, p.districtName || p.location].filter(Boolean).join(', ');
             return {
-                id: p.id,
+                raw: p,
                 title: p.title,
                 price: formatCompactPrice(p),
-                pricePerM2: p.type === 'tanah' && p.pricePerM2 ? p.pricePerM2 : null,
                 status: status,
-                views: views,
-                filter: filt
+                filter: filt,
+                wilayah: wilayah || '—',
             };
         }).filter(function (r) {
             if (filter === 'all') return true;
@@ -171,23 +166,34 @@
             return;
         }
         empty.classList.add('hidden');
-        var detailBase = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl : function (id) { return '../properti-detail?id=' + encodeURIComponent(id); };
         list.forEach(function (r) {
             var tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50/80';
-            var detail = detailBase(r.id);
+            var detail = '/properti-detail?id=' + encodeURIComponent(r.raw.id);
             tr.innerHTML =
-                '<td class="px-4 py-3"><p class="font-medium text-slate-900">' + esc(r.title) + '</p><p class="text-xs text-slate-400 mt-0.5">ID: LST-' + esc(r.id) + '</p></td>' +
-                '<td class="px-4 py-3 text-slate-800 whitespace-nowrap">' + esc(r.price) + (r.pricePerM2 ? '<div class="text-xs text-slate-500 mt-0.5">Rp ' + esc(Number(r.pricePerM2).toLocaleString('id-ID')) + ' / m²</div>' : '') + '</td>' +
+                '<td class="px-4 py-3"><p class="font-medium text-slate-900">' + esc(r.title) + '</p><p class="text-xs text-slate-400 mt-0.5">ID: ' + esc(r.raw.listingCode || r.raw.id) + '</p></td>' +
+                '<td class="px-4 py-3 text-slate-800 whitespace-nowrap">' + esc(r.price) + '</td>' +
                 '<td class="px-4 py-3">' + badgeStatus(r.status) + '</td>' +
-                '<td class="px-4 py-3 text-slate-600">' + r.views.toLocaleString('id-ID') + '</td>' +
+                '<td class="px-4 py-3 text-slate-600">' + esc(r.wilayah) + '</td>' +
                 '<td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">' +
                 '<a href="' + esc(detail) + '" class="text-brand font-medium hover:underline">Lihat</a>' +
-                '<a href="listing-form?id=' + encodeURIComponent(r.id) + '" class="text-slate-500 hover:text-slate-800">Edit</a>' +
+                '<a href="/agent/listing-form?id=' + encodeURIComponent(r.raw.id) + '" class="text-slate-500 hover:text-slate-800">Edit</a>' +
                 '</td>';
             body.appendChild(tr);
         });
     }
+
+    async function load() {
+        await AgentAuth.refresh();
+        if (!AgentAuth.isLoggedIn()) return;
+        document.getElementById('agent-badge').textContent = AgentAuth.getEmail();
+        var r = await fetch('/api/agent/listings', { credentials: 'same-origin' });
+        if (!r.ok) return;
+        LIST = await r.json();
+        render('all');
+    }
+
+    load();
 
     var current = 'all';
     document.querySelectorAll('.filter-tab').forEach(function (btn) {
@@ -201,14 +207,12 @@
         });
     });
 
-    function doLogout() {
-        AgentAuth.logout();
-        window.location.href = 'login.html';
+    async function doLogout() {
+        await AgentAuth.logout();
+        window.location.href = '/agent/login';
     }
     document.getElementById('btn-logout').addEventListener('click', doLogout);
     document.getElementById('btn-logout-mobile').addEventListener('click', doLogout);
-
-    render('all');
 })();
     </script>
 </body>

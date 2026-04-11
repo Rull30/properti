@@ -20,23 +20,21 @@
         };
     </script>
     <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
-    <script src="auth.js"></script>
+    <script src="/agent/auth.js"></script>
 </head>
 <body class="bg-[#f0f2f5] text-slate-800 min-h-screen antialiased">
     <script>
-        (function () {
+        (async function () {
             if (typeof AgentAuth === 'undefined') {
-                window.location.href = 'login.html';
+                window.location.href = '/agent/login';
                 return;
             }
-            if (!AgentAuth.isLoggedIn()) {
-                window.location.href = 'login.html';
-            }
+            var ok = await AgentAuth.guard('/agent/login');
+            if (!ok) return;
         })();
     </script>
 
     <div class="min-h-screen flex">
-        <!-- Sidebar -->
         <aside class="hidden md:flex w-56 lg:w-64 bg-slate-900 text-slate-300 flex-col shrink-0">
             <div class="p-5 border-b border-slate-700/80">
                 <div class="flex items-baseline gap-1">
@@ -46,10 +44,10 @@
                 <p class="text-xs text-slate-500 mt-1">Panel agen</p>
             </div>
             <nav class="flex-1 p-3 space-y-1">
-                <a href="dashboard" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Dashboard</a>
-                <a href="listing-saya" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Listing saya</a>
-                <a href="pesan" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Pesan</a>
-                <a href="profil" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Profil</a>
+                <a href="/agent/dashboard" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Dashboard</a>
+                <a href="/agent/listing-saya" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Listing saya</a>
+                <a href="/agent/pesan" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Pesan</a>
+                <a href="/agent/profil" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Profil</a>
             </nav>
             <div class="p-3 border-t border-slate-700/80">
                 <a href="/" class="block text-xs text-slate-500 hover:text-white px-3 py-2">← Situs publik</a>
@@ -57,13 +55,12 @@
             </div>
         </aside>
 
-        <!-- Main -->
         <div class="flex-1 flex flex-col min-w-0">
             <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h1 class="text-lg sm:text-xl font-bold text-slate-900">Dashboard</h1>
-                        <p class="text-sm text-slate-500">Ringkasan aktivitas akun agen Anda</p>
+                        <p class="text-sm text-slate-500">Ringkasan listing Anda</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <span id="agent-badge" class="text-sm text-slate-600"></span>
@@ -71,10 +68,10 @@
                     </div>
                 </div>
                 <nav class="md:hidden mt-4 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 text-sm">
-                    <a href="dashboard" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Dashboard</a>
-                    <a href="listing-saya" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Listing</a>
-                    <a href="pesan" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Pesan</a>
-                    <a href="profil" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Profil</a>
+                    <a href="/agent/dashboard" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Dashboard</a>
+                    <a href="/agent/listing-saya" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Listing</a>
+                    <a href="/agent/pesan" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Pesan</a>
+                    <a href="/agent/profil" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Profil</a>
                 </nav>
             </header>
 
@@ -84,44 +81,33 @@
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
                         <p class="text-xs font-semibold text-slate-500 uppercase">Listing aktif</p>
-                        <p class="text-2xl font-bold text-slate-900 mt-1">24</p>
-                        <p class="text-xs text-slate-400 mt-1">Demo statis</p>
+                        <p id="stat-listings" class="text-2xl font-bold text-slate-900 mt-1">—</p>
+                        <p class="text-xs text-slate-400 mt-1">Total milik Anda</p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                        <p class="text-xs font-semibold text-slate-500 uppercase">Update (7 hari)</p>
+                        <p id="stat-updated" class="text-2xl font-bold text-slate-900 mt-1">—</p>
+                        <p class="text-xs text-slate-400 mt-1">Listing diubah baru-baru ini</p>
                     </div>
                     <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
                         <p class="text-xs font-semibold text-slate-500 uppercase">Tayangan (7 hari)</p>
-                        <p class="text-2xl font-bold text-slate-900 mt-1">1.240</p>
-                        <p class="text-xs text-slate-400 mt-1">Demo statis</p>
+                        <p id="stat-views" class="text-2xl font-bold text-slate-900 mt-1">0</p>
+                        <p class="text-xs text-slate-400 mt-1">Belum ada tracking</p>
                     </div>
                     <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
                         <p class="text-xs font-semibold text-slate-500 uppercase">Chat masuk</p>
-                        <p class="text-2xl font-bold text-slate-900 mt-1">8</p>
-                        <p class="text-xs text-slate-400 mt-1">Demo statis</p>
-                    </div>
-                    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-                        <p class="text-xs font-semibold text-slate-500 uppercase">Lead baru</p>
-                        <p class="text-2xl font-bold text-brand mt-1">3</p>
-                        <p class="text-xs text-slate-400 mt-1">Demo statis</p>
+                        <p id="stat-chat" class="text-2xl font-bold text-slate-900 mt-1">0</p>
+                        <p class="text-xs text-slate-400 mt-1">Belum ada integrasi</p>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center">
-                        <h2 class="font-bold text-slate-900">Aktivitas terbaru</h2>
-                        <span class="text-xs text-slate-400">Demo</span>
+                        <h2 class="font-bold text-slate-900">Ringkasan</h2>
+                        <a href="/agent/listing-saya" class="text-xs font-semibold text-brand hover:underline">Kelola listing</a>
                     </div>
                     <ul class="divide-y divide-slate-100 text-sm">
-                        <li class="px-5 py-3 flex justify-between gap-4">
-                            <span class="text-slate-600">Listing <strong>Rumah minimalis Pondok Indah</strong> mendapat tayangan baru</span>
-                            <span class="text-slate-400 shrink-0">Hari ini</span>
-                        </li>
-                        <li class="px-5 py-3 flex justify-between gap-4">
-                            <span class="text-slate-600">Pesan WhatsApp dari calon pembeli</span>
-                            <span class="text-slate-400 shrink-0">Kemarin</span>
-                        </li>
-                        <li class="px-5 py-3 flex justify-between gap-4">
-                            <span class="text-slate-600">Profil agen ditinjau (simulasi)</span>
-                            <span class="text-slate-400 shrink-0">3 hari lalu</span>
-                        </li>
+                        <li class="px-5 py-3 text-slate-600">Data dashboard mengikuti akun yang sedang login. Listing publik tetap bisa diakses dari situs utama.</li>
                     </ul>
                 </div>
             </main>
@@ -130,16 +116,28 @@
 
     <script>
 (function () {
-    if (!AgentAuth.isLoggedIn()) return;
+    async function init() {
+        await AgentAuth.refresh();
+        if (!AgentAuth.isLoggedIn()) return;
+        document.getElementById('greet-name').textContent = AgentAuth.getName();
+        document.getElementById('agent-badge').textContent = AgentAuth.getEmail();
 
-    var name = AgentAuth.getName();
-    var email = AgentAuth.getEmail();
-    document.getElementById('greet-name').textContent = name;
-    document.getElementById('agent-badge').textContent = email;
+        try {
+            var r = await fetch('/api/agent/dashboard', { credentials: 'same-origin' });
+            if (!r.ok) return;
+            var d = await r.json();
+            document.getElementById('stat-listings').textContent = String(d.listingActive != null ? d.listingActive : 0);
+            document.getElementById('stat-updated').textContent = String(d.listingUpdated7d != null ? d.listingUpdated7d : 0);
+            document.getElementById('stat-views').textContent = String(d.views7d != null ? d.views7d : 0);
+            document.getElementById('stat-chat').textContent = String(d.chatIn != null ? d.chatIn : 0);
+        } catch (e) {}
+    }
 
-    function doLogout() {
-        AgentAuth.logout();
-        window.location.href = 'login.html';
+    init();
+
+    async function doLogout() {
+        await AgentAuth.logout();
+        window.location.href = '/agent/login';
     }
     document.getElementById('btn-logout').addEventListener('click', doLogout);
     document.getElementById('btn-logout-mobile').addEventListener('click', doLogout);

@@ -20,29 +20,28 @@
         };
     </script>
     <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
-    <script src="auth.js"></script>
-    <script src="../listings-data.js"></script>
-    <script src="../listings-user-storage.js"></script>
-    <script src="../agents-data.js"></script>
+    <script src="/agent/auth.js"></script>
 </head>
 <body class="bg-[#f0f2f5] text-slate-800 min-h-screen antialiased">
     <script>
-        (function () {
-            if (typeof AgentAuth === 'undefined') { window.location.href = 'login.html'; return; }
-            if (!AgentAuth.isLoggedIn()) { window.location.href = 'login.html'; }
+        (async function () {
+            if (typeof AgentAuth === 'undefined') { window.location.href = '/agent/login'; return; }
+            var ok = await AgentAuth.guard('/agent/login');
+            if (!ok) return;
         })();
     </script>
 
     <div class="min-h-screen flex flex-col max-w-3xl mx-auto px-4 py-6 sm:py-10">
         <div class="mb-6 flex items-center justify-between gap-4">
             <div>
-                <a href="listing-saya" class="text-sm text-brand font-medium hover:underline">← Kembali ke listing</a>
+                <a href="/agent/listing-saya" class="text-sm text-brand font-medium hover:underline">← Kembali ke listing</a>
                 <h1 id="form-title" class="text-xl font-bold text-slate-900 mt-2">Listing baru</h1>
             </div>
         </div>
 
         <form id="listing-form" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-8 space-y-5">
             <input type="hidden" name="id" id="f-id" value="">
+            <input type="hidden" id="f-agentId" value="">
 
             <div class="grid sm:grid-cols-2 gap-4">
                 <label class="block sm:col-span-2">
@@ -66,14 +65,27 @@
                         <option value="kost">Kost</option>
                     </select>
                 </label>
+
+                <p class="sm:col-span-2 text-xs text-slate-500 -mt-2" id="wilayah-hint">Memuat data wilayah… (pertama kali bisa beberapa menit; disimpan di database)</p>
                 <label>
-                    <span class="text-sm font-medium text-slate-700">Kota / kabupaten</span>
-                    <input type="text" name="city" id="f-city" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Jakarta Selatan">
+                    <span class="text-sm font-medium text-slate-700">Provinsi</span>
+                    <select id="f-provinceId" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 bg-white focus:ring-brand outline-none">
+                        <option value="">Memuat…</option>
+                    </select>
                 </label>
                 <label>
-                    <span class="text-sm font-medium text-slate-700">Area / kecamatan</span>
-                    <input type="text" name="location" id="f-location" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Pondok Indah">
+                    <span class="text-sm font-medium text-slate-700">Kota / Kabupaten</span>
+                    <select id="f-regencyId" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 bg-white focus:ring-brand outline-none">
+                        <option value="">Pilih provinsi dulu</option>
+                    </select>
                 </label>
+                <label class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Kecamatan</span>
+                    <select id="f-districtId" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 bg-white focus:ring-brand outline-none">
+                        <option value="">Pilih kota/kabupaten dulu</option>
+                    </select>
+                </label>
+
                 <label class="sm:col-span-2">
                     <span class="text-sm font-medium text-slate-700">Alamat lengkap</span>
                     <input type="text" name="address" id="f-address" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Jl. …">
@@ -81,12 +93,11 @@
                 <label>
                     <span class="text-sm font-medium text-slate-700">Harga (Rp)</span>
                     <input type="text" name="priceRupiah" id="f-priceJuta" required inputmode="numeric" autocomplete="off" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none tabular-nums" placeholder="1.250.000.000">
-                    <span class="text-xs text-slate-500 mt-1 block">Masukkan harga normal Rupiah (contoh: <span class="font-mono">850.000.000</span> atau <span class="font-mono">45.000.000</span>).</span>
+                    <span class="text-xs text-slate-500 mt-1 block">Masukkan harga normal Rupiah.</span>
                 </label>
                 <label id="f-price-perm2-wrap" class="hidden">
                     <span class="text-sm font-medium text-slate-700">Harga per m² (khusus tanah)</span>
                     <input type="text" name="pricePerM2Rupiah" id="f-pricePerM2" inputmode="numeric" autocomplete="off" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none tabular-nums" placeholder="4.500.000">
-                    <span class="text-xs text-slate-500 mt-1 block">Opsional. Jika diisi, akan tampil sebagai harga per meter persegi.</span>
                 </label>
                 <label>
                     <span class="text-sm font-medium text-slate-700">Kode listing (opsional)</span>
@@ -115,10 +126,6 @@
                         <option value="HGB">HGB</option>
                         <option value="Hak Pakai">Hak Pakai</option>
                     </select>
-                </label>
-                <label>
-                    <span class="text-sm font-medium text-slate-700">Agen</span>
-                    <select name="agentId" id="f-agentId" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 bg-white focus:ring-brand outline-none"></select>
                 </label>
                 <label>
                     <span class="text-sm font-medium text-slate-700">WhatsApp (62…)</span>
@@ -155,7 +162,6 @@
                         <button type="button" id="btn-add-facility" class="text-xs font-semibold text-brand hover:underline">+ Tambah fasilitas</button>
                     </div>
                     <div id="f-facilities-list" class="space-y-2"></div>
-                    <p class="text-xs text-slate-500 mt-1">Isi fasilitas per baris, tidak perlu pakai koma.</p>
                 </div>
                 <label class="sm:col-span-2">
                     <span class="text-sm font-medium text-slate-700">Catatan cicilan / sewa (opsional)</span>
@@ -166,7 +172,7 @@
             <p id="form-error" class="hidden text-sm text-red-600"></p>
             <div class="flex flex-wrap gap-3 pt-2">
                 <button type="submit" class="inline-flex items-center justify-center bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3 rounded-xl transition">Simpan</button>
-                <a href="listing-saya" class="inline-flex items-center justify-center border border-slate-200 text-slate-700 font-medium px-6 py-3 rounded-xl hover:bg-slate-50">Batal</a>
+                <a href="/agent/listing-saya" class="inline-flex items-center justify-center border border-slate-200 text-slate-700 font-medium px-6 py-3 rounded-xl hover:bg-slate-50">Batal</a>
             </div>
         </form>
     </div>
@@ -200,6 +206,9 @@
     var facilitiesListEl = document.getElementById('f-facilities-list');
     var addFacilityBtn = document.getElementById('btn-add-facility');
     var uploadedImages = [];
+    var fProvince = document.getElementById('f-provinceId');
+    var fRegency = document.getElementById('f-regencyId');
+    var fDistrict = document.getElementById('f-districtId');
 
     function toggleTanahFields() {
         var isTanah = typeEl.value === 'tanah';
@@ -244,7 +253,7 @@
         Array.prototype.forEach.call(files, function (f) {
             formData.append('images', f);
         });
-        var res = await fetch('/api/upload-images', { method: 'POST', body: formData });
+        var res = await fetch('/api/upload-images', { method: 'POST', body: formData, credentials: 'same-origin' });
         if (!res.ok) throw new Error('upload');
         var data = await res.json();
         if (data && Array.isArray(data.files)) {
@@ -321,6 +330,71 @@
         ).filter(Boolean);
     }
 
+    /** Satu fetch: provinsi + kab/kota + kecamatan (dari DB setelah sinkron server). */
+    var wilayahTree = null;
+
+    async function loadWilayahTree() {
+        if (wilayahTree) return;
+        var hint = document.getElementById('wilayah-hint');
+        if (hint) hint.textContent = 'Memuat data wilayah… (pertama kali server mengunduh semua wilayah; mohon tunggu)';
+        var r = await fetch('/api/wilayah/all', { credentials: 'same-origin' });
+        if (!r.ok) {
+            var errBody = await r.json().catch(function () { return {}; });
+            throw new Error((errBody && errBody.message) || 'Gagal memuat wilayah');
+        }
+        wilayahTree = await r.json();
+        if (hint) {
+            hint.textContent = 'Wilayah: provinsi, kota/kabupaten, dan kecamatan (data dari database).';
+        }
+    }
+
+    function fillProvinces() {
+        var rows = (wilayahTree && wilayahTree.provinces) ? wilayahTree.provinces : [];
+        fProvince.innerHTML = '<option value="">Pilih provinsi</option>' +
+            rows.map(function (p) { return '<option value="' + escAttr(p.id) + '">' + escAttr(p.name) + '</option>'; }).join('');
+    }
+
+    function fillRegencies(provinceId) {
+        fRegency.innerHTML = '<option value="">Memuat…</option>';
+        fDistrict.innerHTML = '<option value="">Pilih kota/kabupaten dulu</option>';
+        if (!provinceId) {
+            fRegency.innerHTML = '<option value="">Pilih provinsi dulu</option>';
+            return;
+        }
+        var prov = (wilayahTree.provinces || []).find(function (p) { return p.id === provinceId; });
+        var rows = (prov && prov.regencies) ? prov.regencies : [];
+        fRegency.innerHTML = '<option value="">Pilih kota/kabupaten</option>' +
+            rows.map(function (x) { return '<option value="' + escAttr(x.id) + '">' + escAttr(x.name) + '</option>'; }).join('');
+    }
+
+    function fillDistricts(regencyId) {
+        fDistrict.innerHTML = '<option value="">Memuat…</option>';
+        if (!regencyId) {
+            fDistrict.innerHTML = '<option value="">Pilih kota/kabupaten dulu</option>';
+            return;
+        }
+        var reg = null;
+        (wilayahTree.provinces || []).some(function (p) {
+            return (p.regencies || []).some(function (r) {
+                if (r.id === regencyId) {
+                    reg = r;
+                    return true;
+                }
+                return false;
+            });
+        });
+        var rows = (reg && reg.districts) ? reg.districts : [];
+        fDistrict.innerHTML = '<option value="">Pilih kecamatan</option>' +
+            rows.map(function (x) { return '<option value="' + escAttr(x.id) + '">' + escAttr(x.name) + '</option>'; }).join('');
+    }
+
+    fProvince.addEventListener('change', function () {
+        fillRegencies(fProvince.value);
+    });
+    fRegency.addEventListener('change', function () {
+        fillDistricts(fRegency.value);
+    });
+
     priceEl.addEventListener('blur', function () {
         var n = parseRupiah(priceEl.value);
         if (!isNaN(n) && n >= 0) priceEl.value = formatRupiah(n);
@@ -339,88 +413,97 @@
     });
     typeEl.addEventListener('change', toggleTanahFields);
 
-    var sel = document.getElementById('f-agentId');
-    if (window.AGENTS) {
-        window.AGENTS.forEach(function (a) {
-            var o = document.createElement('option');
-            o.value = a.id;
-            o.textContent = a.name + ' — ' + a.city;
-            sel.appendChild(o);
-        });
+    async function init() {
+        await AgentAuth.refresh();
+        if (!AgentAuth.isLoggedIn()) return;
+        document.getElementById('f-agentId').value = AgentAuth.getId();
+
+        try {
+            await loadWilayahTree();
+        } catch (e) {
+            document.getElementById('form-error').textContent = (e && e.message) ? e.message : 'Gagal memuat data wilayah.';
+            document.getElementById('form-error').classList.remove('hidden');
+            var h = document.getElementById('wilayah-hint');
+            if (h) h.textContent = 'Gagal memuat wilayah. Periksa koneksi server lalu muat ulang halaman.';
+            return;
+        }
+        fillProvinces();
+
+        var params = new URLSearchParams(window.location.search);
+        var editId = params.get('id');
+        if (editId) {
+            document.getElementById('form-title').textContent = 'Edit listing';
+            var lr = await fetch('/api/agent/listings/' + encodeURIComponent(editId), { credentials: 'same-origin' });
+            if (!lr.ok) {
+                document.getElementById('form-error').textContent = 'Listing tidak ditemukan atau bukan milik Anda.';
+                document.getElementById('form-error').classList.remove('hidden');
+                return;
+            }
+            var existing = await lr.json();
+            document.getElementById('f-id').value = existing.id;
+            document.getElementById('f-title').value = existing.title || '';
+            document.getElementById('f-transaction').value = existing.transaction || 'dijual';
+            document.getElementById('f-type').value = existing.type || 'rumah';
+            document.getElementById('f-address').value = existing.address || '';
+            document.getElementById('f-priceJuta').value = existing.priceJuta != null ? formatRupiah(existing.priceJuta * 1000000) : '';
+            document.getElementById('f-listingCode').value = existing.listingCode || '';
+            document.getElementById('f-beds').value = existing.beds != null ? existing.beds : 0;
+            document.getElementById('f-baths').value = existing.baths != null ? existing.baths : 0;
+            document.getElementById('f-land').value = existing.land != null ? existing.land : 0;
+            document.getElementById('f-build').value = existing.build != null ? existing.build : 0;
+            if (existing.type === 'tanah' && existing.land > 0 && existing.priceJuta > 0) {
+                document.getElementById('f-pricePerM2').value = formatRupiah((existing.priceJuta * 1000000) / existing.land);
+            }
+            document.getElementById('f-cert').value = existing.cert || 'SHM';
+            document.getElementById('f-whatsapp').value = existing.whatsapp || '';
+            document.getElementById('f-lat').value = existing.lat != null ? existing.lat : '';
+            document.getElementById('f-lng').value = existing.lng != null ? existing.lng : '';
+            document.getElementById('f-nego').checked = !!existing.nego;
+            document.getElementById('f-newProperty').checked = !!existing.newProperty;
+            uploadedImages = (existing.images || []).slice();
+            renderUploadedImages();
+            var desc = existing.description;
+            document.getElementById('f-description').value = Array.isArray(desc) ? desc.join('\n\n') : (desc || '');
+            renderFacilities(existing.facilities || []);
+            document.getElementById('f-installmentHint').value = existing.installmentHint || '';
+
+            if (existing.provinceId) {
+                fProvince.value = existing.provinceId;
+                fillRegencies(existing.provinceId);
+                if (existing.regencyId) {
+                    fRegency.value = existing.regencyId;
+                    fillDistricts(existing.regencyId);
+                    if (existing.districtId) fDistrict.value = existing.districtId;
+                }
+            }
+        } else {
+            var me = await fetch('/api/agent/me', { credentials: 'same-origin' });
+            if (me.ok) {
+                var md = await me.json();
+                if (md.agent && md.agent.phone) document.getElementById('f-whatsapp').value = md.agent.phone;
+            }
+            renderFacilities(['']);
+        }
+
+        toggleTanahFields();
+        attachDropzone();
     }
 
-    var params = new URLSearchParams(window.location.search);
-    var editId = params.get('id');
-    var existing = editId ? window.getListingById(editId) : null;
+    init();
 
-    if (existing) {
-        document.getElementById('form-title').textContent = 'Edit listing';
-        document.getElementById('f-id').value = existing.id;
-        document.getElementById('f-title').value = existing.title || '';
-        document.getElementById('f-transaction').value = existing.transaction || 'dijual';
-        document.getElementById('f-type').value = existing.type || 'rumah';
-        document.getElementById('f-city').value = existing.city || '';
-        document.getElementById('f-location').value = existing.location || '';
-        document.getElementById('f-address').value = existing.address || '';
-        document.getElementById('f-priceJuta').value = existing.priceJuta != null ? formatRupiah(existing.priceJuta * 1000000) : '';
-        document.getElementById('f-listingCode').value = existing.listingCode || '';
-        document.getElementById('f-beds').value = existing.beds != null ? existing.beds : 0;
-        document.getElementById('f-baths').value = existing.baths != null ? existing.baths : 0;
-        document.getElementById('f-land').value = existing.land != null ? existing.land : 0;
-        document.getElementById('f-build').value = existing.build != null ? existing.build : 0;
-        if (existing.pricePerM2 != null && !isNaN(existing.pricePerM2)) {
-            document.getElementById('f-pricePerM2').value = formatRupiah(existing.pricePerM2);
-        } else if (existing.type === 'tanah' && existing.land > 0 && existing.priceJuta > 0) {
-            document.getElementById('f-pricePerM2').value = formatRupiah((existing.priceJuta * 1000000) / existing.land);
-        }
-        document.getElementById('f-cert').value = existing.cert || 'SHM';
-        if (existing.agentId) document.getElementById('f-agentId').value = existing.agentId;
-        document.getElementById('f-whatsapp').value = existing.whatsapp || '';
-        document.getElementById('f-lat').value = existing.lat != null ? existing.lat : '';
-        document.getElementById('f-lng').value = existing.lng != null ? existing.lng : '';
-        document.getElementById('f-nego').checked = !!existing.nego;
-        document.getElementById('f-newProperty').checked = !!existing.newProperty;
-        uploadedImages = (window.getListingImages(existing) || []).slice();
-        renderUploadedImages();
-        var desc = existing.description;
-        document.getElementById('f-description').value = Array.isArray(desc) ? desc.join('\n\n') : (desc || '');
-        renderFacilities(existing.facilities || []);
-        document.getElementById('f-installmentHint').value = existing.installmentHint || '';
-    } else if (sel.options.length) {
-        sel.selectedIndex = 0;
-        var a0 = window.AGENTS && window.AGENTS[0];
-        if (a0 && a0.phone && !document.getElementById('f-whatsapp').value) {
-            document.getElementById('f-whatsapp').value = a0.phone;
-        }
-    }
-    toggleTanahFields();
-    attachDropzone();
-    if (!existing) renderFacilities(['']);
     addFacilityBtn.addEventListener('click', function () {
         var rows = collectFacilities();
         rows.push('');
         renderFacilities(rows);
     });
 
-    function nextId() {
-        var max = 0;
-        window.LISTINGS.forEach(function (p) {
-            var n = parseInt(p.id, 10);
-            if (!isNaN(n) && n > max) max = n;
-        });
-        return String(max + 1);
-    }
-
-    document.getElementById('listing-form').addEventListener('submit', function (e) {
+    document.getElementById('listing-form').addEventListener('submit', async function (e) {
         e.preventDefault();
         var err = document.getElementById('form-error');
         err.classList.add('hidden');
 
         var idVal = document.getElementById('f-id').value.trim();
-        if (!idVal) idVal = nextId();
-
-        var imgLines = uploadedImages.slice();
-        var ag = window.getAgentById ? window.getAgentById(document.getElementById('f-agentId').value) : null;
+        var isEdit = !!idVal;
 
         var descText = document.getElementById('f-description').value.trim();
         var descArr = descText ? descText.split(/\n\s*\n/).map(function (x) { return x.trim(); }).filter(Boolean) : [''];
@@ -434,34 +517,37 @@
             totalRupiah = Math.round(pricePerM2 * landNum);
         }
 
+        if (!fProvince.value || !fRegency.value || !fDistrict.value) {
+            err.textContent = 'Pilih provinsi, kota/kabupaten, dan kecamatan.';
+            err.classList.remove('hidden');
+            return;
+        }
+
         var obj = {
-            id: idVal,
             title: document.getElementById('f-title').value.trim(),
             transaction: document.getElementById('f-transaction').value,
             type: document.getElementById('f-type').value,
-            city: document.getElementById('f-city').value.trim(),
-            location: document.getElementById('f-location').value.trim(),
             address: document.getElementById('f-address').value.trim(),
             priceJuta: totalRupiah / 1000000,
-            pricePerM2: isTanah && !isNaN(pricePerM2) && pricePerM2 > 0 ? pricePerM2 : null,
             listingCode: document.getElementById('f-listingCode').value.trim(),
             beds: parseInt(document.getElementById('f-beds').value, 10) || 0,
             baths: parseInt(document.getElementById('f-baths').value, 10) || 0,
             land: parseFloat(document.getElementById('f-land').value, 10) || 0,
             build: parseFloat(document.getElementById('f-build').value, 10) || 0,
             cert: document.getElementById('f-cert').value,
-            agentId: document.getElementById('f-agentId').value,
-            agentName: ag ? ag.name : '',
             whatsapp: document.getElementById('f-whatsapp').value.trim(),
             lat: parseFloat(document.getElementById('f-lat').value, 10),
             lng: parseFloat(document.getElementById('f-lng').value, 10),
             nego: document.getElementById('f-nego').checked,
             newProperty: document.getElementById('f-newProperty').checked,
-            images: imgLines,
+            images: uploadedImages.slice(),
             description: descArr,
             facilities: facilities,
             installmentHint: document.getElementById('f-installmentHint').value.trim(),
-            date: new Date().toISOString().slice(0, 10)
+            date: new Date().toISOString().slice(0, 10),
+            provinceId: fProvince.value || null,
+            regencyId: fRegency.value || null,
+            districtId: fDistrict.value || null,
         };
 
         if (!obj.images.length) {
@@ -471,31 +557,38 @@
         }
         obj.image = obj.images[0];
         if (isNaN(obj.priceJuta) || obj.priceJuta < 0) {
-            err.textContent = 'Harga tidak valid. Gunakan angka Rupiah (contoh: 850000000).';
+            err.textContent = 'Harga tidak valid.';
             err.classList.remove('hidden');
             return;
         }
-        document.getElementById('f-priceJuta').value = formatRupiah(obj.priceJuta * 1000000);
         if (isNaN(obj.lat) || isNaN(obj.lng)) {
             obj.lat = -6.2;
             obj.lng = 106.8;
         }
 
         try {
-            var raw = localStorage.getItem('portal_listings_user');
-            var arr = raw ? JSON.parse(raw) : [];
-            if (!Array.isArray(arr)) arr = [];
-            var idx = arr.findIndex(function (x) { return String(x.id) === String(obj.id); });
-            if (idx >= 0) arr[idx] = obj;
-            else arr.push(obj);
-            localStorage.setItem('portal_listings_user', JSON.stringify(arr));
+            var url = isEdit ? '/api/agent/listings/' + encodeURIComponent(idVal) : '/api/agent/listings';
+            var method = isEdit ? 'PUT' : 'POST';
+            if (!isEdit) delete obj.id;
+            else obj.id = idVal;
+
+            var res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(obj),
+            });
+            if (!res.ok) {
+                var er = await res.json().catch(function () { return {}; });
+                err.textContent = er.message || 'Gagal menyimpan.';
+                err.classList.remove('hidden');
+                return;
+            }
+            window.location.href = '/agent/listing-saya';
         } catch (ex) {
             err.textContent = 'Gagal menyimpan.';
             err.classList.remove('hidden');
-            return;
         }
-
-        window.location.href = 'listing-saya.html';
     });
 })();
     </script>

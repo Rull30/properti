@@ -5,16 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Area Agen | Rumah123</title>
     <meta name="robots" content="noindex, nofollow">
-    <script src="auth.js"></script>
+    <script src="/agent/auth.js"></script>
 </head>
 <body>
     <script>
-        if (typeof AgentAuth !== 'undefined' && AgentAuth.isLoggedIn()) {
-            window.location.replace('dashboard.html');
-        } else {
-            window.location.replace('login.html');
-        }
+        (async function () {
+            if (typeof AgentAuth !== 'undefined') {
+                await AgentAuth.refresh();
+                if (AgentAuth.isLoggedIn()) {
+                    window.location.replace('/agent/dashboard');
+                    return;
+                }
+            }
+            window.location.replace('/agent/login');
+        })();
     </script>
-    <p class="p-4 font-sans text-slate-600"><a href="login">Lanjut ke login agen</a></p>
+    <p class="p-4 font-sans text-slate-600"><a href="/agent/login">Lanjut ke login agen</a></p>
 </body>
 </html>

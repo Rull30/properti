@@ -10,14 +10,18 @@
     "preview": "vite preview",
     "start": "node server.js",
     "prisma:generate": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "db:import": "node scripts/import-data.js",
+    "db:agent-passwords": "node scripts/set-agent-passwords.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "ejs": "^5.0.1",
     "express": "^4.19.2",
+    "express-session": "^1.19.0",
     "morgan": "^1.10.0",
     "multer": "^2.1.1",
     "prisma": "^6.19.3"
