@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carikan Properti | Rumah123</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' },
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .filter-drawer-open { overflow: hidden; }
+        #filter-panel { transition: transform 0.25s ease; }
+        @media (min-width: 1024px) {
+            #filter-overlay { display: none !important; }
+            #filter-panel { transform: none !important; position: relative !important; }
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/navbar-DGje6dV3.js"></script>
+</head>
+<body class="bg-[#f5f5f5] text-slate-800 antialiased">
+
+    <div data-navbar-host data-navbar-active="cari-properti"></div>
+
+    <!-- Bar pencarian utama -->
+    <section class="bg-white border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900 mb-4">Carikan properti</h1>
+            <form id="form-search" class="space-y-4" action="cari-properti" method="get">
+                <div class="flex flex-col lg:flex-row gap-3 lg:items-end">
+                    <div class="flex-1 min-w-0">
+                        <label for="inp-q" class="block text-xs font-medium text-slate-500 mb-1">Kata kunci</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            </span>
+                            <input type="text" id="inp-q" name="q" placeholder="Nama properti, area, atau alamat" class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-56">
+                        <label for="inp-city" class="block text-xs font-medium text-slate-500 mb-1">Kota / wilayah</label>
+                        <select id="inp-city" name="kota" class="w-full py-3 px-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none bg-white">
+                            <option value="">Semua kota</option>
+                            <option value="Jakarta Selatan">Jakarta Selatan</option>
+                            <option value="Jakarta Timur">Jakarta Timur</option>
+                            <option value="Bandung">Bandung</option>
+                            <option value="Surabaya">Surabaya</option>
+                            <option value="Tangerang">Tangerang</option>
+                            <option value="Jakarta Utara">Jakarta Utara</option>
+                            <option value="Cianjur">Cianjur</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-wrap rounded-xl bg-slate-200/80 p-1 gap-1 self-end w-full lg:w-auto">
+                        <button type="button" data-trans="all" class="trans-tab flex-1 min-w-[4.5rem] lg:flex-none px-3 sm:px-4 py-2.5 rounded-lg text-sm font-semibold transition">Semua</button>
+                        <button type="button" data-trans="dijual" class="trans-tab flex-1 min-w-[4.5rem] lg:flex-none px-3 sm:px-4 py-2.5 rounded-lg text-sm font-semibold transition">Dijual</button>
+                        <button type="button" data-trans="disewa" class="trans-tab flex-1 min-w-[4.5rem] lg:flex-none px-3 sm:px-4 py-2.5 rounded-lg text-sm font-semibold transition">Disewa</button>
+                        <button type="button" data-trans="baru" class="trans-tab flex-1 min-w-[4.5rem] lg:flex-none px-3 sm:px-4 py-2.5 rounded-lg text-sm font-semibold transition">Baru</button>
+                    </div>
+                    <input type="hidden" name="transaksi" id="inp-trans" value="">
+                    <button type="submit" class="w-full lg:w-auto shrink-0 bg-brand hover:bg-brand-dark text-white font-bold py-3 px-8 rounded-xl shadow-md transition">Cari</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <!-- Overlay mobile -->
+        <div id="filter-overlay" class="fixed inset-0 bg-black/40 z-[60] opacity-0 pointer-events-none transition-opacity lg:hidden" aria-hidden="true"></div>
+
+        <!-- Panel filter -->
+        <aside id="filter-panel" class="fixed lg:static inset-y-0 left-0 z-[70] w-[min(100%,320px)] lg:w-72 shrink-0 bg-white lg:bg-transparent -translate-x-full lg:translate-x-0 lg:block border-r lg:border-0 border-slate-200 shadow-xl lg:shadow-none overflow-y-auto">
+            <div class="p-4 lg:p-0 lg:sticky lg:top-24 space-y-6">
+                <div class="flex items-center justify-between lg:hidden pb-2 border-b border-slate-100">
+                    <span class="font-bold text-slate-900">Filter</span>
+                    <button type="button" id="btn-close-filter" class="p-2 text-slate-500 hover:text-brand rounded-lg" aria-label="Tutup filter">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:p-5 lg:shadow-sm space-y-5">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900 mb-2">Tipe properti</p>
+                        <div id="filter-types" class="flex flex-wrap gap-2">
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" name="tipe" value="rumah" class="type-cb rounded border-slate-300 text-brand focus:ring-brand"> <span class="text-sm">Rumah</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" name="tipe" value="apartemen" class="type-cb rounded border-slate-300 text-brand focus:ring-brand"> <span class="text-sm">Apartemen</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" name="tipe" value="ruko" class="type-cb rounded border-slate-300 text-brand focus:ring-brand"> <span class="text-sm">Ruko</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" name="tipe" value="tanah" class="type-cb rounded border-slate-300 text-brand focus:ring-brand"> <span class="text-sm">Tanah</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" name="tipe" value="kost" class="type-cb rounded border-slate-300 text-brand focus:ring-brand"> <span class="text-sm">Kost</span></label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900 mb-2">Harga (juta Rp)</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-xs text-slate-500">Minimum</label>
+                                <input type="number" id="price-min" min="0" placeholder="0" class="w-full mt-0.5 py-2 px-3 rounded-lg border border-slate-200 text-sm focus:ring-brand focus:border-brand">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-500">Maksimum</label>
+                                <input type="number" id="price-max" min="0" placeholder="∞" class="w-full mt-0.5 py-2 px-3 rounded-lg border border-slate-200 text-sm focus:ring-brand focus:border-brand">
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Untuk disewa: harga per tahun (juta)</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-sm font-semibold text-slate-900">Kamar tidur ≥</label>
+                            <select id="bed-min" class="mt-1 w-full py-2 px-3 rounded-lg border border-slate-200 text-sm focus:ring-brand">
+                                <option value="">Semua</option>
+                                <option value="1">1+</option>
+                                <option value="2">2+</option>
+                                <option value="3">3+</option>
+                                <option value="4">4+</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold text-slate-900">Kamar mandi ≥</label>
+                            <select id="bath-min" class="mt-1 w-full py-2 px-3 rounded-lg border border-slate-200 text-sm focus:ring-brand">
+                                <option value="">Semua</option>
+                                <option value="1">1+</option>
+                                <option value="2">2+</option>
+                                <option value="3">3+</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900 mb-2">Luas tanah (m²)</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="land-min" min="0" placeholder="Min" class="py-2 px-3 rounded-lg border border-slate-200 text-sm">
+                            <input type="number" id="land-max" min="0" placeholder="Max" class="py-2 px-3 rounded-lg border border-slate-200 text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900 mb-2">Luas bangunan (m²)</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="build-min" min="0" placeholder="Min" class="py-2 px-3 rounded-lg border border-slate-200 text-sm">
+                            <input type="number" id="build-max" min="0" placeholder="Max" class="py-2 px-3 rounded-lg border border-slate-200 text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-semibold text-slate-900">Sertifikat</label>
+                        <select id="cert-filter" class="mt-1 w-full py-2 px-3 rounded-lg border border-slate-200 text-sm focus:ring-brand">
+                            <option value="">Semua</option>
+                            <option value="SHM">SHM</option>
+                            <option value="HGB">HGB</option>
+                            <option value="Hak Pakai">Hak Pakai</option>
+                        </select>
+                    </div>
+
+                    <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+                        <button type="button" id="btn-apply-filter" class="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-2.5 rounded-xl transition">Terapkan filter</button>
+                        <button type="button" id="btn-reset-filter" class="w-full border border-slate-200 text-slate-700 font-medium py-2.5 rounded-xl hover:bg-slate-50 transition">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Hasil -->
+        <div class="flex-1 min-w-0">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" id="btn-open-filter" class="lg:hidden inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 shadow-sm">
+                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        Filter
+                    </button>
+                    <p class="text-sm text-slate-600"><span id="result-count" class="font-bold text-slate-900">0</span> properti ditemukan</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="sort-select" class="text-sm text-slate-500 whitespace-nowrap">Urutkan</label>
+                    <select id="sort-select" class="py-2 pl-3 pr-8 rounded-lg border border-slate-200 text-sm font-medium bg-white focus:ring-brand focus:border-brand">
+                        <option value="newest">Terbaru</option>
+                        <option value="price_asc">Harga terendah</option>
+                        <option value="price_desc">Harga tertinggi</option>
+                        <option value="land_desc">Luas tanah terbesar</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="active-chips" class="flex flex-wrap gap-2 mb-4 min-h-[1.5rem]"></div>
+
+            <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+
+            <div id="empty-state" class="hidden text-center py-16 px-4 bg-white rounded-xl border border-dashed border-slate-200">
+                <p class="text-slate-600 mb-2">Tidak ada properti yang cocok dengan filter.</p>
+                <button type="button" id="btn-empty-reset" class="text-brand font-semibold hover:underline">Hapus semua filter</button>
+            </div>
+
+            <div id="pagination-wrap" class="mt-8 flex justify-center gap-2 flex-wrap"></div>
+        </div>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-300 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <p class="text-center text-sm text-slate-500">&copy; 2026 Demo Portal Properti · <a href="/" class="text-brand hover:underline">Beranda</a></p>
+        </div>
+    </footer>
+
+    <script src="/listings-data.js"></script>
+    <script src="/listings-user-storage.js"></script>
+    <script>
+(function () {
+    var LISTINGS = window.LISTINGS;
+    var formatPrice = window.formatListingPrice;
+    if (!LISTINGS || !LISTINGS.length || typeof formatPrice !== 'function') return;
+
+    var state = {
+        q: '',
+        city: '',
+        transaction: '',
+        types: [],
+        priceMin: null,
+        priceMax: null,
+        bedMin: null,
+        bathMin: null,
+        landMin: null,
+        landMax: null,
+        buildMin: null,
+        buildMax: null,
+        cert: '',
+        sort: 'newest',
+        page: 1,
+        perPage: 6
+    };
+
+    function numOk(v) {
+        return v != null && typeof v === 'number' && !isNaN(v);
+    }
+
+    function matches(p, s) {
+        var q = (s.q || '').toLowerCase().trim();
+        if (q) {
+            var blob = (p.title + ' ' + p.location + ' ' + p.city).toLowerCase();
+            if (blob.indexOf(q) === -1) return false;
+        }
+        if (s.city && p.city !== s.city) return false;
+        if (s.transaction && p.transaction !== s.transaction) return false;
+        if (s.types.length) {
+            if (s.types.indexOf(p.type) === -1) return false;
+        }
+        if (numOk(s.priceMin) && p.priceJuta < s.priceMin) return false;
+        if (numOk(s.priceMax) && p.priceJuta > s.priceMax) return false;
+        if (numOk(s.bedMin) && p.beds < s.bedMin) return false;
+        if (numOk(s.bathMin) && p.baths < s.bathMin) return false;
+        if (numOk(s.landMin) && p.land < s.landMin) return false;
+        if (numOk(s.landMax) && p.land > s.landMax) return false;
+        if (numOk(s.buildMin) && p.build < s.buildMin) return false;
+        if (numOk(s.buildMax) && p.build > s.buildMax) return false;
+        if (s.cert && p.cert !== s.cert) return false;
+        return true;
+    }
+
+    function sortList(arr, sort) {
+        var out = arr.slice();
+        if (sort === 'newest') {
+            out.sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
+        } else if (sort === 'price_asc') {
+            out.sort(function (a, b) { return a.priceJuta - b.priceJuta; });
+        } else if (sort === 'price_desc') {
+            out.sort(function (a, b) { return b.priceJuta - a.priceJuta; });
+        } else if (sort === 'land_desc') {
+            out.sort(function (a, b) { return b.land - a.land; });
+        }
+        return out;
+    }
+
+    function parseNumLoose(raw) {
+        if (raw === '' || raw == null) return null;
+        var n = parseFloat(String(raw).replace(',', '.'));
+        return isNaN(n) ? null : n;
+    }
+
+    function parseIntLoose(raw) {
+        if (raw === '' || raw == null) return null;
+        var n = parseInt(raw, 10);
+        return isNaN(n) ? null : n;
+    }
+
+    function readFiltersFromUI() {
+        var types = [];
+        document.querySelectorAll('.type-cb:checked').forEach(function (cb) {
+            types.push(cb.value);
+        });
+        var pm = document.getElementById('price-min').value;
+        var px = document.getElementById('price-max').value;
+        var lm = document.getElementById('land-min').value;
+        var lx = document.getElementById('land-max').value;
+        var bm = document.getElementById('build-min').value;
+        var bx = document.getElementById('build-max').value;
+        state.q = document.getElementById('inp-q').value.trim();
+        state.city = document.getElementById('inp-city').value;
+        state.transaction = document.getElementById('inp-trans').value;
+        state.types = types;
+        state.priceMin = parseNumLoose(pm);
+        state.priceMax = parseNumLoose(px);
+        state.bedMin = parseIntLoose(document.getElementById('bed-min').value);
+        state.bathMin = parseIntLoose(document.getElementById('bath-min').value);
+        state.landMin = parseNumLoose(lm);
+        state.landMax = parseNumLoose(lx);
+        state.buildMin = parseNumLoose(bm);
+        state.buildMax = parseNumLoose(bx);
+        state.cert = document.getElementById('cert-filter').value;
+        state.sort = document.getElementById('sort-select').value;
+    }
+
+    function applyUIFromState() {
+        document.getElementById('inp-q').value = state.q;
+        document.getElementById('inp-city').value = state.city;
+        document.getElementById('inp-trans').value = state.transaction;
+        syncTransTabs();
+        document.querySelectorAll('.type-cb').forEach(function (cb) {
+            cb.checked = state.types.indexOf(cb.value) !== -1;
+        });
+        document.getElementById('price-min').value = state.priceMin != null ? state.priceMin : '';
+        document.getElementById('price-max').value = state.priceMax != null ? state.priceMax : '';
+        document.getElementById('bed-min').value = state.bedMin != null ? String(state.bedMin) : '';
+        document.getElementById('bath-min').value = state.bathMin != null ? String(state.bathMin) : '';
+        document.getElementById('land-min').value = state.landMin != null ? state.landMin : '';
+        document.getElementById('land-max').value = state.landMax != null ? state.landMax : '';
+        document.getElementById('build-min').value = state.buildMin != null ? state.buildMin : '';
+        document.getElementById('build-max').value = state.buildMax != null ? state.buildMax : '';
+        document.getElementById('cert-filter').value = state.cert;
+        document.getElementById('sort-select').value = state.sort;
+    }
+
+    function syncTransTabs() {
+        document.querySelectorAll('.trans-tab').forEach(function (btn) {
+            var d = btn.getAttribute('data-trans');
+            var on = (d === 'all' && !state.transaction) || (d !== 'all' && state.transaction === d);
+            btn.classList.toggle('bg-white', on);
+            btn.classList.toggle('text-brand', on);
+            btn.classList.toggle('shadow-sm', on);
+            btn.classList.toggle('text-slate-600', !on);
+        });
+    }
+
+    function pushURL() {
+        var params = new URLSearchParams();
+        if (state.q) params.set('q', state.q);
+        if (state.city) params.set('kota', state.city);
+        if (state.transaction) params.set('transaksi', state.transaction);
+        state.types.forEach(function (t) { params.append('tipe', t); });
+        if (numOk(state.priceMin)) params.set('harga_min', String(state.priceMin));
+        if (numOk(state.priceMax)) params.set('harga_max', String(state.priceMax));
+        if (numOk(state.bedMin)) params.set('kt', String(state.bedMin));
+        if (numOk(state.bathMin)) params.set('km', String(state.bathMin));
+        if (numOk(state.landMin)) params.set('ltanah_min', String(state.landMin));
+        if (numOk(state.landMax)) params.set('ltanah_max', String(state.landMax));
+        if (numOk(state.buildMin)) params.set('lbangun_min', String(state.buildMin));
+        if (numOk(state.buildMax)) params.set('lbangun_max', String(state.buildMax));
+        if (state.cert) params.set('sertifikat', state.cert);
+        if (state.sort && state.sort !== 'newest') params.set('urut', state.sort);
+        if (state.page > 1) params.set('hal', String(state.page));
+        var qs = params.toString();
+        var url = '/cari-properti' + (qs ? '?' + qs : '');
+        if (history.replaceState) history.replaceState(null, '', url);
+    }
+
+    function loadFromURL() {
+        var u = new URLSearchParams(window.location.search);
+        state.q = u.get('q') || '';
+        state.city = u.get('kota') || '';
+        state.transaction = u.get('transaksi') || '';
+        state.types = u.getAll('tipe');
+        state.priceMin = parseNumLoose(u.get('harga_min'));
+        state.priceMax = parseNumLoose(u.get('harga_max'));
+        state.bedMin = parseIntLoose(u.get('kt'));
+        state.bathMin = parseIntLoose(u.get('km'));
+        state.landMin = parseNumLoose(u.get('ltanah_min'));
+        state.landMax = parseNumLoose(u.get('ltanah_max'));
+        state.buildMin = parseNumLoose(u.get('lbangun_min'));
+        state.buildMax = parseNumLoose(u.get('lbangun_max'));
+        state.cert = u.get('sertifikat') || '';
+        state.sort = u.get('urut') || 'newest';
+        var hal = u.get('hal');
+        state.page = hal ? Math.max(1, parseInt(hal, 10) || 1) : 1;
+        applyUIFromState();
+    }
+
+    function buildChips() {
+        var wrap = document.getElementById('active-chips');
+        wrap.innerHTML = '';
+        var chips = [];
+        if (state.transaction) {
+            var transLabel = { dijual: 'Dijual', disewa: 'Disewa', baru: 'Properti Baru' }[state.transaction] || state.transaction;
+            chips.push({ label: transLabel, key: 'trans' });
+        }
+        state.types.forEach(function (t) {
+            chips.push({ label: t.charAt(0).toUpperCase() + t.slice(1), key: 'type:' + t });
+        });
+        if (state.city) chips.push({ label: state.city, key: 'city' });
+        if (state.q) chips.push({ label: '“' + state.q + '”', key: 'q' });
+        if (numOk(state.priceMin) || numOk(state.priceMax)) {
+            chips.push({ label: 'Harga: ' + (numOk(state.priceMin) ? state.priceMin : '0') + '–' + (numOk(state.priceMax) ? state.priceMax : '∞') + ' Jt', key: 'price' });
+        }
+        if (numOk(state.landMin) || numOk(state.landMax)) {
+            chips.push({ label: 'Tanah ' + (numOk(state.landMin) ? state.landMin : '0') + '–' + (numOk(state.landMax) ? state.landMax : '∞') + ' m²', key: 'land' });
+        }
+        if (numOk(state.buildMin) || numOk(state.buildMax)) {
+            chips.push({ label: 'Bangunan ' + (numOk(state.buildMin) ? state.buildMin : '0') + '–' + (numOk(state.buildMax) ? state.buildMax : '∞') + ' m²', key: 'build' });
+        }
+        if (numOk(state.bedMin)) chips.push({ label: state.bedMin + '+ KT', key: 'kt' });
+        if (numOk(state.bathMin)) chips.push({ label: state.bathMin + '+ KM', key: 'km' });
+        if (state.cert) chips.push({ label: state.cert, key: 'cert' });
+        chips.forEach(function (c) {
+            var span = document.createElement('span');
+            span.className = 'inline-flex items-center gap-1 bg-brand-light text-brand text-xs font-medium px-2.5 py-1 rounded-full border border-red-100';
+            span.textContent = c.label;
+            wrap.appendChild(span);
+        });
+    }
+
+    function render() {
+        readFiltersFromUI();
+        var filtered = LISTINGS.filter(function (p) { return matches(p, state); });
+        filtered = sortList(filtered, state.sort);
+        var total = filtered.length;
+        document.getElementById('result-count').textContent = String(total);
+
+        var grid = document.getElementById('results-grid');
+        var empty = document.getElementById('empty-state');
+        var pag = document.getElementById('pagination-wrap');
+        grid.innerHTML = '';
+        pag.innerHTML = '';
+
+        if (total === 0) {
+            empty.classList.remove('hidden');
+            grid.classList.add('hidden');
+            buildChips();
+            pushURL();
+            return;
+        }
+        empty.classList.add('hidden');
+        grid.classList.remove('hidden');
+
+        var pages = Math.max(1, Math.ceil(total / state.perPage));
+        if (state.page > pages) state.page = pages;
+        var start = (state.page - 1) * state.perPage;
+        var slice = filtered.slice(start, start + state.perPage);
+
+        slice.forEach(function (p) {
+            var card = document.createElement('article');
+            card.className = 'bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-lg transition';
+            var badge = p.transaction === 'dijual'
+                ? '<span class="bg-brand text-white text-xs font-bold px-2.5 py-1 rounded">Dijual</span>'
+                : '<span class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded">Disewa</span>';
+            var nego = p.nego ? '<span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded">Nego</span>' : '';
+            var href = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl(p.id) : (p.detailUrl || '#');
+            var specLand = p.type === 'tanah' ? '<span><strong class="text-slate-800">' + p.land + '</strong> m² tanah</span>' : '<span><strong class="text-slate-800">' + p.beds + '</strong> KT</span><span><strong class="text-slate-800">' + p.baths + '</strong> KM</span><span><strong class="text-slate-800">' + p.build + '</strong> m²</span>';
+            card.innerHTML =
+                '<a href="' + href + '" class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">' +
+                '<div class="relative h-48 overflow-hidden group">' +
+                '<img src="' + p.image + '" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">' +
+                '<div class="absolute top-3 left-3 flex gap-2">' + badge + nego + '</div></div>' +
+                '<div class="p-4">' +
+                '<p class="text-lg font-bold text-brand">' + formatPrice(p) + '</p>' +
+                '<h2 class="font-bold text-slate-900 line-clamp-2 mt-1">' + escapeHtml(p.title) + '</h2>' +
+                '<p class="text-slate-500 text-sm mt-1 flex items-center gap-1">' +
+                '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' +
+                p.location + ', ' + p.city + '</p>' +
+                '<div class="flex justify-between text-sm text-slate-600 border-t border-slate-100 pt-3 mt-3">' + specLand + '</div>' +
+                '</div></a>';
+            grid.appendChild(card);
+        });
+
+        if (pages > 1) {
+            for (var i = 1; i <= pages; i++) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = String(i);
+                b.className = 'min-w-[2.5rem] py-2 rounded-lg text-sm font-semibold ' + (i === state.page ? 'bg-brand text-white' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50');
+                b.dataset.page = String(i);
+                b.addEventListener('click', function () {
+                    state.page = parseInt(this.dataset.page, 10);
+                    render();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                pag.appendChild(b);
+            }
+        }
+
+        buildChips();
+        pushURL();
+    }
+
+    function escapeHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    function resetFilters() {
+        state.types = [];
+        state.priceMin = state.priceMax = null;
+        state.bedMin = state.bathMin = null;
+        state.landMin = state.landMax = null;
+        state.buildMin = state.buildMax = null;
+        state.cert = '';
+        document.querySelectorAll('.type-cb').forEach(function (cb) { cb.checked = false; });
+        document.getElementById('price-min').value = '';
+        document.getElementById('price-max').value = '';
+        document.getElementById('bed-min').value = '';
+        document.getElementById('bath-min').value = '';
+        document.getElementById('land-min').value = '';
+        document.getElementById('land-max').value = '';
+        document.getElementById('build-min').value = '';
+        document.getElementById('build-max').value = '';
+        document.getElementById('cert-filter').value = '';
+        state.page = 1;
+    }
+
+    function openFilterDrawer(open) {
+        var panel = document.getElementById('filter-panel');
+        var ov = document.getElementById('filter-overlay');
+        if (open) {
+            panel.classList.remove('-translate-x-full');
+            ov.classList.remove('opacity-0', 'pointer-events-none');
+            ov.classList.add('opacity-100');
+            document.body.classList.add('filter-drawer-open');
+        } else {
+            panel.classList.add('-translate-x-full');
+            ov.classList.add('opacity-0', 'pointer-events-none');
+            ov.classList.remove('opacity-100');
+            document.body.classList.remove('filter-drawer-open');
+        }
+    }
+
+    document.querySelectorAll('.trans-tab').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var d = btn.getAttribute('data-trans');
+            state.transaction = d === 'all' ? '' : d;
+            var hid = document.getElementById('inp-trans');
+            if (hid) hid.value = state.transaction;
+            syncTransTabs();
+            state.page = 1;
+            render();
+        });
+    });
+
+    document.getElementById('form-search').addEventListener('submit', function (e) {
+        e.preventDefault();
+        readFiltersFromUI();
+        state.page = 1;
+        render();
+        openFilterDrawer(false);
+    });
+
+    document.getElementById('sort-select').addEventListener('change', function () {
+        state.sort = this.value;
+        state.page = 1;
+        render();
+    });
+
+    document.getElementById('btn-apply-filter').addEventListener('click', function () {
+        state.page = 1;
+        render();
+        openFilterDrawer(false);
+    });
+
+    document.getElementById('btn-reset-filter').addEventListener('click', function () {
+        resetFilters();
+        render();
+    });
+
+    document.getElementById('btn-empty-reset').addEventListener('click', function () {
+        document.getElementById('inp-q').value = '';
+        document.getElementById('inp-city').value = '';
+        state.transaction = '';
+        document.getElementById('inp-trans').value = '';
+        syncTransTabs();
+        resetFilters();
+        render();
+    });
+
+    document.getElementById('btn-open-filter').addEventListener('click', function () { openFilterDrawer(true); });
+    document.getElementById('btn-close-filter').addEventListener('click', function () { openFilterDrawer(false); });
+    document.getElementById('filter-overlay').addEventListener('click', function () { openFilterDrawer(false); });
+
+    var debounceTimer = null;
+    function debounceRender() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () {
+            state.page = 1;
+            render();
+        }, 300);
+    }
+    function filterChangedImmediate() {
+        clearTimeout(debounceTimer);
+        state.page = 1;
+        render();
+    }
+
+    document.querySelectorAll('#filter-types input').forEach(function (el) {
+        el.addEventListener('change', filterChangedImmediate);
+    });
+    document.getElementById('bed-min').addEventListener('change', filterChangedImmediate);
+    document.getElementById('bath-min').addEventListener('change', filterChangedImmediate);
+    document.getElementById('cert-filter').addEventListener('change', filterChangedImmediate);
+    document.getElementById('inp-city').addEventListener('change', filterChangedImmediate);
+
+    ['price-min', 'price-max', 'land-min', 'land-max', 'build-min', 'build-max'].forEach(function (id) {
+        var el = document.getElementById(id);
+        el.addEventListener('input', debounceRender);
+        el.addEventListener('change', filterChangedImmediate);
+    });
+
+    document.getElementById('inp-q').addEventListener('input', debounceRender);
+    document.getElementById('inp-q').addEventListener('change', filterChangedImmediate);
+
+    loadFromURL();
+    readFiltersFromUI();
+    syncTransTabs();
+    render();
+})();
+    </script>
+</body>
+</html>

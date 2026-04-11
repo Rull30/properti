@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Properti | Dunia Rumah Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' } },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        /* Tailwind Preflight memaksa max-width pada img — ubin Leaflet jadi tidak tampil (layar abu-abu) */
+        .leaflet-container img.leaflet-tile,
+        .leaflet-container img.leaflet-image-layer,
+        .leaflet-container .leaflet-marker-icon img,
+        .leaflet-container .leaflet-marker-shadow {
+            max-width: none !important;
+        }
+        .leaflet-container svg {
+            max-width: none !important;
+        }
+        .leaflet-container { font-family: inherit; z-index: 0; }
+        .detail-pin .leaflet-marker-icon { background: transparent; border: none; }
+    </style>
+  <script type="module" crossorigin src="/assets/navbar-DGje6dV3.js"></script>
+</head>
+<body class="bg-[#f5f5f5] text-slate-800 antialiased">
+
+    <div data-navbar-host data-navbar-active="cari-properti"></div>
+
+    <div id="page-not-found" class="hidden max-w-2xl mx-auto px-4 py-20 text-center">
+        <p class="text-slate-600 mb-4">Properti tidak ditemukan atau sudah tidak tersedia.</p>
+        <a href="cari-properti" class="text-brand font-semibold hover:underline">Cari properti lain →</a>
+    </div>
+
+    <div id="page-content" class="hidden">
+        <div class="bg-white border-b border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                <nav id="breadcrumb" class="text-sm text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-1" aria-label="Breadcrumb"></nav>
+            </div>
+        </div>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                        <div class="relative aspect-[16/10] sm:aspect-[16/9] bg-slate-200">
+                            <img id="main-photo" src="" alt="" class="w-full h-full object-cover">
+                            <div id="gallery-badges" class="absolute top-3 left-3 flex flex-wrap gap-2"></div>
+                            <div class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded" id="photo-counter">1 / 1</div>
+                        </div>
+                        <div class="p-3 sm:p-4 flex gap-2 overflow-x-auto" id="thumbs" role="tablist"></div>
+                    </div>
+
+                    <div class="lg:hidden bg-white rounded-xl border border-slate-200 p-5 shadow-sm" id="summary-mobile"></div>
+
+                    <section class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+                        <h2 class="text-lg font-bold text-slate-900 mb-4">Spesifikasi properti</h2>
+                        <dl id="spec-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm"></dl>
+                    </section>
+
+                    <section class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+                        <h2 class="text-lg font-bold text-slate-900 mb-3">Deskripsi</h2>
+                        <div id="description-block" class="prose prose-sm max-w-none text-slate-600 space-y-3"></div>
+                    </section>
+
+                    <section class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+                        <h2 class="text-lg font-bold text-slate-900 mb-4">Fasilitas</h2>
+                        <ul id="facilities-list" class="flex flex-wrap gap-2"></ul>
+                    </section>
+
+                    <section class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                        <div class="p-5 pb-0">
+                            <h2 class="text-lg font-bold text-slate-900">Lokasi</h2>
+                            <p class="text-sm text-slate-500 mt-1">Pin menunjuk perkiraan titik lokasi; lingkaran menunjuk area perkiraan di sekitarnya (bukan batas pasti).</p>
+                        </div>
+                        <div class="mt-4 h-56 sm:h-64 bg-slate-100 relative">
+                            <div id="detail-map" class="absolute inset-0 w-full h-full" role="img" aria-label="Peta lokasi properti"></div>
+                        </div>
+                    </section>
+                </div>
+
+                <aside class="lg:col-span-1">
+                    <div class="lg:sticky lg:top-20 space-y-4">
+                        <div class="hidden lg:block bg-white rounded-xl border border-slate-200 p-5 shadow-sm" id="summary-desktop"></div>
+                        <div id="agent-card" class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm"></div>
+                    </div>
+                </aside>
+            </div>
+
+            <section class="mt-12 pt-10 border-t border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-6">Properti serupa di sekitar</h2>
+                <div id="similar-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-300 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <p class="text-center text-sm text-slate-500">&copy; 2026 Demo Portal Properti. <a href="/" class="text-brand hover:underline">Beranda</a></p>
+        </div>
+    </footer>
+
+    <script src="/listings-data.js"></script>
+    <script src="/listings-user-storage.js"></script>
+    <script src="/agents-data.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+(function () {
+    function esc(s) {
+        var d = document.createElement('div');
+        d.textContent = s == null ? '' : String(s);
+        return d.innerHTML;
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var id = params.get('id');
+    var p = id ? window.getListingById(id) : null;
+
+    if (!p) {
+        document.getElementById('page-not-found').classList.remove('hidden');
+        document.title = 'Properti tidak ditemukan | Dunia Rumah Pro';
+        return;
+    }
+
+    document.getElementById('page-content').classList.remove('hidden');
+    document.title = p.title + ' — ' + (p.transaction === 'dijual' ? 'Dijual' : 'Disewa') + ' | Dunia Rumah Pro';
+
+    var images = window.getListingImages(p);
+    if (!images.length) images = ['https://placehold.co/1200x800/e2e8f0/64748b?text=Foto'];
+
+    var transQs = p.transaction === 'disewa' ? 'disewa' : 'dijual';
+    var bc = document.getElementById('breadcrumb');
+    bc.innerHTML =
+        '<a href="/" class="hover:text-brand">Beranda</a><span class="text-slate-300">/</span>' +
+        '<a href="cari-properti?transaksi=' + transQs + '" class="hover:text-brand">' + (p.transaction === 'dijual' ? 'Dijual' : 'Disewa') + '</a><span class="text-slate-300">/</span>' +
+        '<a href="cari-properti?kota=' + encodeURIComponent(p.city) + '" class="hover:text-brand">' + esc(p.city) + '</a><span class="text-slate-300">/</span>' +
+        '<span class="text-slate-800 font-medium">' + esc(p.location) + '</span>';
+
+    var priceHtml = window.formatListingPriceRupiah(p);
+    var dateStr = p.date || '';
+    var code = p.listingCode || ('ID-' + p.id);
+
+    function summaryBlock() {
+        return (
+            '<p class="text-2xl font-bold text-brand">' + priceHtml + '</p>' +
+            (p.installmentHint ? '<p class="text-sm text-slate-500 mt-1">' + esc(p.installmentHint) + '</p>' : '') +
+            '<h1 class="text-xl font-bold text-slate-900 mt-3 lg:mt-4 leading-snug">' + esc(p.title) + '</h1>' +
+            '<p class="text-slate-600 text-sm mt-2 flex items-start gap-2">' +
+            '<svg class="w-5 h-5 shrink-0 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' +
+            esc(p.address || (p.location + ', ' + p.city)) +
+            '</p>' +
+            '<p class="text-xs text-slate-400 mt-3">ID Listing: <span class="font-mono">' + esc(code) + '</span>' + (dateStr ? ' · Tayang ' + esc(dateStr) : '') + '</p>'
+        );
+    }
+    document.getElementById('summary-mobile').innerHTML = summaryBlock();
+    document.getElementById('summary-desktop').innerHTML = summaryBlock() + (
+        '<p class="text-xs text-slate-400 mt-3">ID: <span class="font-mono">' + esc(code) + '</span></p>'
+    );
+
+    var badgeEl = document.getElementById('gallery-badges');
+    badgeEl.innerHTML =
+        '<span class="bg-brand text-white text-xs font-bold px-2.5 py-1 rounded shadow">' + (p.transaction === 'dijual' ? 'Dijual' : 'Disewa') + '</span>' +
+        (p.nego ? '<span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded shadow">Nego</span>' : '') +
+        (p.newProperty ? '<span class="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded shadow">Baru</span>' : '');
+
+    var mainPh = document.getElementById('main-photo');
+    mainPh.src = images[0];
+    mainPh.alt = p.title;
+
+    var thumbsWrap = document.getElementById('thumbs');
+    var counter = document.getElementById('photo-counter');
+    var total = images.length;
+    counter.textContent = '1 / ' + total;
+
+    images.forEach(function (src, i) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'thumb-btn shrink-0 w-20 h-14 sm:w-24 sm:h-16 rounded-lg overflow-hidden ' + (i === 0 ? 'ring-2 ring-brand ring-offset-2' : 'opacity-80 hover:opacity-100');
+        btn.dataset.src = src;
+        btn.dataset.idx = String(i + 1);
+        btn.innerHTML = '<img src="' + String(src).replace(/"/g, '&quot;') + '" alt="" class="w-full h-full object-cover">';
+        btn.addEventListener('click', function () {
+            mainPh.src = src;
+            counter.textContent = (i + 1) + ' / ' + total;
+            thumbsWrap.querySelectorAll('.thumb-btn').forEach(function (t, j) {
+                t.className = 'thumb-btn shrink-0 w-20 h-14 sm:w-24 sm:h-16 rounded-lg overflow-hidden ' + (j === i ? 'ring-2 ring-brand ring-offset-2' : 'opacity-80 hover:opacity-100');
+            });
+        });
+        thumbsWrap.appendChild(btn);
+    });
+
+    var spec = document.getElementById('spec-grid');
+    var rows = [
+        { k: 'Tipe properti', v: window.typeLabel(p.type) },
+        { k: 'Kamar tidur', v: p.type === 'tanah' ? '—' : String(p.beds) },
+        { k: 'Kamar mandi', v: p.type === 'tanah' ? '—' : String(p.baths) },
+        { k: 'Luas tanah', v: p.land ? p.land + ' m²' : '—' },
+        { k: 'Luas bangunan', v: p.build ? p.build + ' m²' : '—' },
+        { k: 'Lantai', v: p.floors != null ? String(p.floors) : '—' },
+        { k: 'Sertifikat', v: p.cert || '—' },
+        { k: 'Daya listrik', v: p.electricity || '—' },
+        { k: 'Hadap', v: p.facing || '—' }
+    ];
+    spec.innerHTML = rows.map(function (r) {
+        return '<div class="border border-slate-100 rounded-lg p-3 bg-slate-50/80"><dt class="text-slate-500">' + esc(r.k) + '</dt><dd class="font-semibold text-slate-900 mt-0.5">' + r.v + '</dd></div>';
+    }).join('');
+
+    var desc = document.getElementById('description-block');
+    var paras = Array.isArray(p.description) ? p.description : [p.description || ''];
+    desc.innerHTML = paras.map(function (t) {
+        return '<p' + (String(t).indexOf('*') === 0 ? ' class="text-xs text-slate-400"' : '') + '>' + esc(t) + '</p>';
+    }).join('');
+
+    var fac = document.getElementById('facilities-list');
+    fac.innerHTML = (p.facilities || []).map(function (f) {
+        return '<li class="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-full">' + esc(f) + '</li>';
+    }).join('');
+
+    var lat = parseFloat(p.lat);
+    var lng = parseFloat(p.lng);
+    if (isNaN(lat)) lat = -6.2;
+    if (isNaN(lng)) lng = 106.8;
+
+    (function initDetailMap() {
+        var mapEl = document.getElementById('detail-map');
+        if (!mapEl || typeof L === 'undefined') return;
+
+        var radiusM = parseFloat(p.locationRadiusM, 10);
+        if (isNaN(radiusM) || radiusM <= 0) radiusM = 420;
+
+        /** Bounds dari titik pusat + radius meter — hindari circle.getBounds() sebelum peta siap (hindari error Leaflet). */
+        function boundsAround(lat0, lng0, rM) {
+            var R = 6371000;
+            var dLat = (rM / R) * (180 / Math.PI);
+            var cos = Math.cos(lat0 * Math.PI / 180);
+            var dLng = cos > 0.01 ? (rM / (R * cos)) * (180 / Math.PI) : dLat;
+            return L.latLngBounds(
+                [lat0 - dLat, lng0 - dLng],
+                [lat0 + dLat, lng0 + dLng]
+            );
+        }
+
+        var map = L.map('detail-map', { scrollWheelZoom: false, attributionControl: true });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        L.circle([lat, lng], {
+            radius: radiusM,
+            color: '#E02020',
+            fillColor: '#E02020',
+            fillOpacity: 0.14,
+            weight: 2,
+            opacity: 0.9
+        }).addTo(map);
+
+        var pinHtml =
+            '<div class="flex flex-col items-center" style="transform:translateY(-4px)">' +
+            '<svg width="40" height="52" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+            '<path d="M20 0C8.954 0 0 8.28 0 18.5C0 32.75 20 52 20 52S40 32.75 40 18.5C40 8.28 31.046 0 20 0Z" fill="#E02020"/>' +
+            '<circle cx="20" cy="18" r="6" fill="white"/>' +
+            '</svg></div>';
+
+        var pinIcon = L.divIcon({
+            className: 'detail-pin',
+            html: pinHtml,
+            iconSize: [40, 52],
+            iconAnchor: [20, 52],
+            popupAnchor: [0, -48]
+        });
+
+        L.marker([lat, lng], { icon: pinIcon, zIndexOffset: 1000 }).addTo(map);
+
+        function fitMap() {
+            try {
+                map.fitBounds(boundsAround(lat, lng, radiusM), { padding: [28, 28], maxZoom: 16 });
+            } catch (e) {
+                map.setView([lat, lng], 15);
+            }
+        }
+
+        map.whenReady(fitMap);
+        setTimeout(function () {
+            map.invalidateSize();
+            fitMap();
+        }, 200);
+    })();
+
+    var agent = typeof window.getAgentById === 'function' ? window.getAgentById(p.agentId) : null;
+    var aname = agent ? agent.name : p.agentName;
+    var initials = aname ? aname.split(/\s+/).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase() : '?';
+    var ahref = agent ? 'agen-detail?id=' + encodeURIComponent(agent.id) : '#';
+    var waNumber = p && p.whatsapp ? String(p.whatsapp) : (agent && agent.phone ? String(agent.phone) : '');
+    var detailPath = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl(p.id) : ('properti-detail?id=' + encodeURIComponent(String(p.id)));
+    var detailUrl = '';
+    try {
+        detailUrl = new URL(detailPath, window.location.origin).href;
+    } catch (e) {
+        detailUrl = detailPath;
+    }
+    var waMsg = 'permisi, saya tertarik dengan properti ini.\n\nLink detail properti:\n' + detailUrl;
+    var waHref = 'https://wa.me/' + encodeURIComponent(waNumber) + '?text=' + encodeURIComponent(waMsg);
+    document.getElementById('agent-card').innerHTML =
+        '<h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Hubungi agen</h2>' +
+        '<div class="flex items-center gap-3 mb-4">' +
+        '<div class="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-lg">' + esc(initials) + '</div>' +
+        '<div>' +
+        '<a href="' + ahref + '" class="font-bold text-slate-900 hover:text-brand">' + esc(aname) + '</a>' +
+        (agent ? '<p class="text-sm text-slate-500">' + esc(agent.agency) + '</p>' : '') +
+        '</div></div>' +
+        '<a href="' + esc(waHref) + '" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition mb-2">Chat WhatsApp</a>';
+
+    var similar = window.LISTINGS.filter(function (x) {
+        return String(x.id) !== String(p.id) && x.city === p.city;
+    }).slice(0, 2);
+    if (similar.length < 2) {
+        window.LISTINGS.forEach(function (x) {
+            if (similar.length >= 2) return;
+            if (String(x.id) === String(p.id)) return;
+            if (similar.some(function (s) { return s.id === x.id; })) return;
+            similar.push(x);
+        });
+    }
+    similar = similar.slice(0, 2);
+
+    var simEl = document.getElementById('similar-grid');
+    simEl.innerHTML = similar.map(function (s) {
+        return (
+            '<a href="' + esc(window.getListingDetailUrl(s.id)) + '" class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition group">' +
+            '<div class="relative h-44 overflow-hidden">' +
+            '<img src="' + esc(s.image) + '" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></div>' +
+            '<div class="p-4">' +
+            '<p class="font-bold text-brand">' + esc(window.formatListingPrice(s)) + '</p>' +
+            '<p class="font-semibold text-slate-900 mt-1 line-clamp-2">' + esc(s.title) + '</p>' +
+            '<p class="text-sm text-slate-500 mt-1">' + esc(s.location) + '</p></div></a>'
+        );
+    }).join('');
+    if (similar.length < 3) {
+        simEl.innerHTML += '<a href="cari-properti" class="sm:col-span-2 lg:col-span-1 flex items-center justify-center rounded-xl border-2 border-dashed border-slate-300 text-brand font-semibold hover:bg-white hover:border-brand/50 min-h-[200px] transition">Lihat lebih banyak →</a>';
+    }
+})();
+    </script>
+</body>
+</html>

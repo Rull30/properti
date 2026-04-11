@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cari Agen Properti | Rumah123</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' } },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .filter-drawer-open { overflow: hidden; }
+        #filter-panel { transition: transform 0.25s ease; }
+        @media (min-width: 1024px) {
+            #filter-overlay { display: none !important; }
+            #filter-panel { transform: none !important; position: relative !important; }
+        }
+    </style>
+    <script src="/agents-data.js"></script>
+  <script type="module" crossorigin src="/assets/navbar-DGje6dV3.js"></script>
+</head>
+<body class="bg-[#f5f5f5] text-slate-800 antialiased">
+
+
+    <div data-navbar-host data-navbar-active="cari-agen"></div>
+
+    <section class="bg-white border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900 mb-1">Cari agen properti</h1>
+            <p class="text-sm text-slate-500 mb-4">Temukan agen berpengalaman di kota dan spesialisasi yang Anda butuhkan.</p>
+            <form id="form-search" action="cari-agen" method="get" class="flex flex-col sm:flex-row gap-3 sm:items-end">
+                <div class="flex-1 min-w-0">
+                    <label for="inp-q" class="block text-xs font-medium text-slate-500 mb-1">Nama agen atau kantor</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </span>
+                        <input type="text" id="inp-q" name="q" placeholder="Contoh: Budi, Prime Property…" class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none" autocomplete="off">
+                    </div>
+                </div>
+                <div class="w-full sm:w-56">
+                    <label for="inp-city" class="block text-xs font-medium text-slate-500 mb-1">Kota kantor agen</label>
+                    <select id="inp-city" name="kota" class="w-full py-3 px-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand/30 bg-white outline-none">
+                        <option value="">Semua kota</option>
+                        <option value="Jakarta Selatan">Jakarta Selatan</option>
+                        <option value="Jakarta Timur">Jakarta Timur</option>
+                        <option value="Jakarta Utara">Jakarta Utara</option>
+                        <option value="Bandung">Bandung</option>
+                        <option value="Surabaya">Surabaya</option>
+                        <option value="Tangerang">Tangerang</option>
+                        <option value="Cianjur">Cianjur</option>
+                        <option value="Solo">Solo</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full sm:w-auto shrink-0 bg-brand hover:bg-brand-dark text-white font-bold py-3 px-8 rounded-xl shadow-md transition">Cari</button>
+            </form>
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <div id="filter-overlay" class="fixed inset-0 bg-black/40 z-[60] opacity-0 pointer-events-none transition-opacity lg:hidden" aria-hidden="true"></div>
+
+        <aside id="filter-panel" class=" w-[min(100%,320px)] lg:w-72 shrink-0 bg-white lg:bg-transparent -translate-x-full lg:translate-x-0 border-r lg:border-0 border-slate-200 shadow-xl lg:shadow-none overflow-y-auto">
+            <div class="p-0 lg:p-0 lg:top-0">
+                <div class="flex items-center justify-between lg:hidden pb-2 border-b border-slate-100">
+                    <span class="font-bold text-slate-900">Filter</span>
+                    <button type="button" id="btn-close-filter" class="p-2 text-slate-500 hover:text-brand rounded-lg" aria-label="Tutup"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                </div>
+
+                <div class="bg-white lg:rounded-xl lg:border lg:border-slate-200 lg:p-5 lg:shadow-sm space-y-5">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900 mb-2">Spesialisasi</p>
+                        <div id="filter-specs" class="flex flex-wrap gap-2">
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" class="spec-cb rounded border-slate-300 text-brand" value="rumah"> <span class="text-sm">Rumah</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" class="spec-cb rounded border-slate-300 text-brand" value="apartemen"> <span class="text-sm">Apartemen</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" class="spec-cb rounded border-slate-300 text-brand" value="ruko"> <span class="text-sm">Ruko</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" class="spec-cb rounded border-slate-300 text-brand" value="tanah"> <span class="text-sm">Tanah</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" class="spec-cb rounded border-slate-300 text-brand" value="villa"> <span class="text-sm">Villa</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" class="spec-cb rounded border-slate-300 text-brand" value="komersial"> <span class="text-sm">Komersial</span></label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" class="spec-cb rounded border-slate-300 text-brand" value="mewah"> <span class="text-sm">Mewah</span></label>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Agen punya salah satu spesialisasi yang dicentang</p>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-semibold text-slate-900">Minimal listing aktif</label>
+                        <input type="number" id="min-listings" min="0" placeholder="0" class="mt-1 w-full py-2 px-3 rounded-lg border border-slate-200 text-sm">
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-semibold text-slate-900">Pengalaman minimal</label>
+                        <select id="min-years" class="mt-1 w-full py-2 px-3 rounded-lg border border-slate-200 text-sm">
+                            <option value="">Semua</option>
+                            <option value="1">1+ tahun</option>
+                            <option value="2">2+ tahun</option>
+                            <option value="3">3+ tahun</option>
+                            <option value="5">5+ tahun</option>
+                            <option value="8">8+ tahun</option>
+                        </select>
+                    </div>
+
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="verified-only" class="rounded border-slate-300 text-brand focus:ring-brand">
+                        <span class="text-sm font-medium text-slate-800">Hanya agen terverifikasi</span>
+                    </label>
+
+                    <div class="flex flex-col gap-2 pt-2 border-t border-slate-100">
+                        <button type="button" id="btn-apply-filter" class="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-2.5 rounded-xl transition">Terapkan</button>
+                        <button type="button" id="btn-reset-filter" class="w-full border border-slate-200 text-slate-700 font-medium py-2.5 rounded-xl hover:bg-slate-50 transition">Reset filter</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 min-w-0">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" id="btn-open-filter" class="lg:hidden inline-flex items-center gap-2 border border-slate-200 bg-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm">
+                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        Filter
+                    </button>
+                    <p class="text-sm text-slate-600"><span id="result-count" class="font-bold text-slate-900">0</span> agen ditemukan</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="sort-select" class="text-sm text-slate-500">Urutkan</label>
+                    <select id="sort-select" class="py-2 pl-3 pr-8 rounded-lg border border-slate-200 text-sm font-medium bg-white focus:ring-brand">
+                        <option value="rating_desc">Rating tertinggi</option>
+                        <option value="listings_desc">Listing terbanyak</option>
+                        <option value="name_asc">Nama A–Z</option>
+                        <option value="years_desc">Pengalaman terlama</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- <div id="active-chips" class="flex flex-wrap gap-2 mb-4 min-h-[1.5rem]"></div> -->
+
+            <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-5"></div>
+
+            <div id="empty-state" class="hidden text-center py-16 px-4 bg-white rounded-xl border border-dashed border-slate-200">
+                <p class="text-slate-600 mb-2">Tidak ada agen yang cocok.</p>
+                <button type="button" id="btn-empty-reset" class="text-brand font-semibold hover:underline">Hapus filter</button>
+            </div>
+
+            <div id="pagination-wrap" class="mt-8 flex justify-center gap-2 flex-wrap"></div>
+        </div>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-300 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <p class="text-center text-sm text-slate-500">&copy; 2026 Demo Portal Properti · <a href="/" class="text-brand hover:underline">Beranda</a></p>
+        </div>
+    </footer>
+
+    <script>
+(function () {
+    var state = {
+        q: '',
+        city: '',
+        specs: [],
+        minListings: null,
+        minYears: null,
+        verifiedOnly: false,
+        sort: 'rating_desc',
+        page: 1,
+        perPage: 6
+    };
+
+    function numOk(v) {
+        return v != null && typeof v === 'number' && !isNaN(v);
+    }
+
+    function parseNumLoose(raw) {
+        if (raw === '' || raw == null) return null;
+        var n = parseFloat(String(raw).replace(',', '.'));
+        return isNaN(n) ? null : n;
+    }
+
+    function parseIntLoose(raw) {
+        if (raw === '' || raw == null) return null;
+        var n = parseInt(raw, 10);
+        return isNaN(n) ? null : n;
+    }
+
+    function specLabel(s) {
+        var m = { rumah: 'Rumah', apartemen: 'Apartemen', ruko: 'Ruko', tanah: 'Tanah', villa: 'Villa', komersial: 'Komersial', mewah: 'Mewah' };
+        return m[s] || s;
+    }
+
+    function hasSpecOverlap(agentSpecs, selected) {
+        if (!selected.length) return true;
+        for (var i = 0; i < selected.length; i++) {
+            if (agentSpecs.indexOf(selected[i]) !== -1) return true;
+        }
+        return false;
+    }
+
+    function matches(a, s) {
+        var q = (s.q || '').toLowerCase().trim();
+        if (q) {
+            var blob = (a.name + ' ' + a.agency + ' ' + a.areas.join(' ')).toLowerCase();
+            if (blob.indexOf(q) === -1) return false;
+        }
+        if (s.city && a.city !== s.city) return false;
+        if (!hasSpecOverlap(a.specialties, s.specs)) return false;
+        if (numOk(s.minListings) && a.listingCount < s.minListings) return false;
+        if (numOk(s.minYears) && a.yearsExp < s.minYears) return false;
+        if (s.verifiedOnly && !a.verified) return false;
+        return true;
+    }
+
+    function sortAgents(arr, sort) {
+        var out = arr.slice();
+        if (sort === 'rating_desc') {
+            out.sort(function (x, y) { return y.rating - x.rating; });
+        } else if (sort === 'listings_desc') {
+            out.sort(function (x, y) { return y.listingCount - x.listingCount; });
+        } else if (sort === 'name_asc') {
+            out.sort(function (x, y) { return x.name.localeCompare(y.name, 'id'); });
+        } else if (sort === 'years_desc') {
+            out.sort(function (x, y) { return y.yearsExp - x.yearsExp; });
+        }
+        return out;
+    }
+
+    function readFiltersFromUI() {
+        var specs = [];
+        document.querySelectorAll('.spec-cb:checked').forEach(function (cb) { specs.push(cb.value); });
+        state.q = document.getElementById('inp-q').value.trim();
+        state.city = document.getElementById('inp-city').value;
+        state.specs = specs;
+        state.minListings = parseNumLoose(document.getElementById('min-listings').value);
+        state.minYears = parseIntLoose(document.getElementById('min-years').value);
+        state.verifiedOnly = document.getElementById('verified-only').checked;
+        state.sort = document.getElementById('sort-select').value;
+    }
+
+    function applyUIFromState() {
+        document.getElementById('inp-q').value = state.q;
+        document.getElementById('inp-city').value = state.city;
+        document.querySelectorAll('.spec-cb').forEach(function (cb) {
+            cb.checked = state.specs.indexOf(cb.value) !== -1;
+        });
+        document.getElementById('min-listings').value = numOk(state.minListings) ? state.minListings : '';
+        document.getElementById('min-years').value = numOk(state.minYears) ? String(state.minYears) : '';
+        document.getElementById('verified-only').checked = state.verifiedOnly;
+        document.getElementById('sort-select').value = state.sort;
+    }
+
+    function pushURL() {
+        var params = new URLSearchParams();
+        if (state.q) params.set('q', state.q);
+        if (state.city) params.set('kota', state.city);
+        state.specs.forEach(function (s) { params.append('spes', s); });
+        if (numOk(state.minListings)) params.set('min_listing', String(state.minListings));
+        if (numOk(state.minYears)) params.set('min_tahun', String(state.minYears));
+        if (state.verifiedOnly) params.set('verified', '1');
+        if (state.sort && state.sort !== 'rating_desc') params.set('urut', state.sort);
+        if (state.page > 1) params.set('hal', String(state.page));
+        var qs = params.toString();
+        var url = '/cari-agen' + (qs ? '?' + qs : '');
+        if (history.replaceState) history.replaceState(null, '', url);
+    }
+
+    function loadFromURL() {
+        var u = new URLSearchParams(window.location.search);
+        state.q = u.get('q') || '';
+        state.city = u.get('kota') || '';
+        state.specs = u.getAll('spes');
+        state.minListings = parseNumLoose(u.get('min_listing'));
+        state.minYears = parseIntLoose(u.get('min_tahun'));
+        state.verifiedOnly = u.get('verified') === '1';
+        state.sort = u.get('urut') || 'rating_desc';
+        var hal = u.get('hal');
+        state.page = hal ? Math.max(1, parseInt(hal, 10) || 1) : 1;
+        applyUIFromState();
+    }
+
+    function buildChips() {
+        var wrap = document.getElementById('active-chips');
+        wrap.innerHTML = '';
+        var chips = [];
+        if (state.city) chips.push(state.city);
+        state.specs.forEach(function (s) { chips.push(specLabel(s)); });
+        if (numOk(state.minListings)) chips.push('≥ ' + state.minListings + ' listing');
+        if (numOk(state.minYears)) chips.push('≥ ' + state.minYears + ' thn');
+        if (state.verifiedOnly) chips.push('Terverifikasi');
+        if (state.q) chips.push('“' + state.q + '”');
+        chips.forEach(function (label) {
+            var span = document.createElement('span');
+            span.className = 'inline-flex items-center bg-brand-light text-brand text-xs font-medium px-2.5 py-1 rounded-full border border-red-100';
+            span.textContent = label;
+            wrap.appendChild(span);
+        });
+    }
+
+    function escapeHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    function render() {
+        readFiltersFromUI();
+        var list = window.AGENTS || [];
+        var filtered = list.filter(function (a) { return matches(a, state); });
+        filtered = sortAgents(filtered, state.sort);
+        var total = filtered.length;
+        document.getElementById('result-count').textContent = String(total);
+
+        var grid = document.getElementById('results-grid');
+        var empty = document.getElementById('empty-state');
+        var pag = document.getElementById('pagination-wrap');
+        grid.innerHTML = '';
+        pag.innerHTML = '';
+
+        if (total === 0) {
+            empty.classList.remove('hidden');
+            grid.classList.add('hidden');
+            buildChips();
+            pushURL();
+            return;
+        }
+        empty.classList.add('hidden');
+        grid.classList.remove('hidden');
+
+        var pages = Math.max(1, Math.ceil(total / state.perPage));
+        if (state.page > pages) state.page = pages;
+        var start = (state.page - 1) * state.perPage;
+        var slice = filtered.slice(start, start + state.perPage);
+
+        slice.forEach(function (a) {
+            var initials = a.name.split(/\s+/).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase();
+            var ver = a.verified ? '<span class="text-[10px] font-bold uppercase tracking-wide text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Terverifikasi</span>' : '';
+            var card = document.createElement('article');
+            card.className = 'bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition overflow-hidden';
+            var specs = a.specialties.map(function (s) {
+                return '<span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">' + escapeHtml(specLabel(s)) + '</span>';
+            }).join('');
+            card.innerHTML =
+                '<a href="agen-detail?id=' + encodeURIComponent(a.id) + '" class="block p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-xl">' +
+                '<div class="flex gap-4">' +
+                '<div class="w-14 h-14 shrink-0 rounded-full bg-gradient-to-br from-brand/20 to-brand/5 flex items-center justify-center text-brand font-bold text-lg">' + escapeHtml(initials) + '</div>' +
+                '<div class="min-w-0 flex-1">' +
+                '<div class="flex flex-wrap items-center gap-2 mb-0.5">' +
+                '<h2 class="font-bold text-slate-900 truncate">' + escapeHtml(a.name) + '</h2>' + ver +
+                '</div>' +
+                '<p class="text-sm text-slate-500 truncate">' + escapeHtml(a.agency) + '</p>' +
+                '<p class="text-sm text-slate-600 mt-2 flex items-center gap-1">' +
+                '<svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' +
+                escapeHtml(a.city) +
+                '</p>' +
+                '</div></div>' +
+                '<div class="flex flex-wrap gap-1.5 mt-4">' + specs + '</div>' +
+                '<div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-100 text-sm">' +
+                '<span class="text-slate-600"><strong class="text-slate-900">' + a.listingCount + '</strong> listing</span>' +
+                '<span class="text-slate-600">' + a.yearsExp + ' thn · ★ ' + a.rating + ' <span class="text-slate-400">(' + a.reviewCount + ')</span></span>' +
+                '</div>' +
+                '</a>';
+            grid.appendChild(card);
+        });
+
+        if (pages > 1) {
+            for (var i = 1; i <= pages; i++) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = String(i);
+                b.className = 'min-w-[2.5rem] py-2 rounded-lg text-sm font-semibold ' + (i === state.page ? 'bg-brand text-white' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50');
+                b.dataset.page = String(i);
+                b.addEventListener('click', function () {
+                    state.page = parseInt(this.dataset.page, 10);
+                    render();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                pag.appendChild(b);
+            }
+        }
+
+        buildChips();
+        pushURL();
+    }
+
+    function resetFilters() {
+        state.specs = [];
+        state.minListings = null;
+        state.minYears = null;
+        state.verifiedOnly = false;
+        document.querySelectorAll('.spec-cb').forEach(function (cb) { cb.checked = false; });
+        document.getElementById('min-listings').value = '';
+        document.getElementById('min-years').value = '';
+        document.getElementById('verified-only').checked = false;
+        state.page = 1;
+    }
+
+    function openFilterDrawer(open) {
+        var panel = document.getElementById('filter-panel');
+        var ov = document.getElementById('filter-overlay');
+        if (open) {
+            panel.classList.remove('-translate-x-full');
+            ov.classList.remove('opacity-0', 'pointer-events-none');
+            ov.classList.add('opacity-100');
+            document.body.classList.add('filter-drawer-open');
+        } else {
+            panel.classList.add('-translate-x-full');
+            ov.classList.add('opacity-0', 'pointer-events-none');
+            ov.classList.remove('opacity-100');
+            document.body.classList.remove('filter-drawer-open');
+        }
+    }
+
+    var debounceTimer = null;
+    function debounceRender() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () { state.page = 1; render(); }, 300);
+    }
+    function filterNow() {
+        clearTimeout(debounceTimer);
+        state.page = 1;
+        render();
+    }
+
+    document.getElementById('form-search').addEventListener('submit', function (e) {
+        e.preventDefault();
+        state.page = 1;
+        render();
+        openFilterDrawer(false);
+    });
+
+    document.getElementById('sort-select').addEventListener('change', filterNow);
+
+    document.getElementById('btn-apply-filter').addEventListener('click', function () { filterNow(); openFilterDrawer(false); });
+    document.getElementById('btn-reset-filter').addEventListener('click', function () { resetFilters(); render(); });
+    document.getElementById('btn-empty-reset').addEventListener('click', function () {
+        document.getElementById('inp-q').value = '';
+        document.getElementById('inp-city').value = '';
+        resetFilters();
+        render();
+    });
+
+    document.getElementById('btn-open-filter').addEventListener('click', function () { openFilterDrawer(true); });
+    document.getElementById('btn-close-filter').addEventListener('click', function () { openFilterDrawer(false); });
+    document.getElementById('filter-overlay').addEventListener('click', function () { openFilterDrawer(false); });
+
+    document.querySelectorAll('.spec-cb').forEach(function (el) { el.addEventListener('change', filterNow); });
+    document.getElementById('min-years').addEventListener('change', filterNow);
+    document.getElementById('verified-only').addEventListener('change', filterNow);
+    document.getElementById('inp-city').addEventListener('change', filterNow);
+    document.getElementById('min-listings').addEventListener('input', debounceRender);
+    document.getElementById('min-listings').addEventListener('change', filterNow);
+    document.getElementById('inp-q').addEventListener('input', debounceRender);
+    document.getElementById('inp-q').addEventListener('change', filterNow);
+
+    loadFromURL();
+    readFiltersFromUI();
+    render();
+})();
+    </script>
+</body>
+</html>

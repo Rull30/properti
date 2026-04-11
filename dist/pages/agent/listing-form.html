@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form listing | Rumah123 Agen</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' } },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+    <script src="auth.js"></script>
+    <script src="../listings-data.js"></script>
+    <script src="../listings-user-storage.js"></script>
+    <script src="../agents-data.js"></script>
+</head>
+<body class="bg-[#f0f2f5] text-slate-800 min-h-screen antialiased">
+    <script>
+        (function () {
+            if (typeof AgentAuth === 'undefined') { window.location.href = 'login.html'; return; }
+            if (!AgentAuth.isLoggedIn()) { window.location.href = 'login.html'; }
+        })();
+    </script>
+
+    <div class="min-h-screen flex flex-col max-w-3xl mx-auto px-4 py-6 sm:py-10">
+        <div class="mb-6 flex items-center justify-between gap-4">
+            <div>
+                <a href="listing-saya" class="text-sm text-brand font-medium hover:underline">← Kembali ke listing</a>
+                <h1 id="form-title" class="text-xl font-bold text-slate-900 mt-2">Listing baru</h1>
+            </div>
+        </div>
+
+        <form id="listing-form" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-8 space-y-5">
+            <input type="hidden" name="id" id="f-id" value="">
+
+            <div class="grid sm:grid-cols-2 gap-4">
+                <label class="block sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Judul iklan</span>
+                    <input type="text" name="title" id="f-title" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none" placeholder="Contoh: Rumah 2 lantai dekat tol">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Transaksi</span>
+                    <select name="transaction" id="f-transaction" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none bg-white">
+                        <option value="dijual">Dijual</option>
+                        <option value="disewa">Disewa</option>
+                    </select>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Tipe</span>
+                    <select name="type" id="f-type" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none bg-white">
+                        <option value="rumah">Rumah</option>
+                        <option value="apartemen">Apartemen</option>
+                        <option value="ruko">Ruko</option>
+                        <option value="tanah">Tanah</option>
+                        <option value="kost">Kost</option>
+                    </select>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Kota / kabupaten</span>
+                    <input type="text" name="city" id="f-city" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Jakarta Selatan">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Area / kecamatan</span>
+                    <input type="text" name="location" id="f-location" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Pondok Indah">
+                </label>
+                <label class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Alamat lengkap</span>
+                    <input type="text" name="address" id="f-address" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Jl. …">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Harga (juta Rp)</span>
+                    <input type="text" name="priceJuta" id="f-priceJuta" required inputmode="decimal" autocomplete="off" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none tabular-nums" placeholder="1.250,5">
+                    <span class="text-xs text-slate-500 mt-1 block">Format angka Indonesia (contoh: <span class="font-mono">850</span> atau <span class="font-mono">1.250,5</span> juta)</span>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Kode listing (opsional)</span>
+                    <input type="text" name="listingCode" id="f-listingCode" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="RMH-XXX-001">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">KT</span>
+                    <input type="number" name="beds" id="f-beds" min="0" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" value="0">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">KM</span>
+                    <input type="number" name="baths" id="f-baths" min="0" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" value="0">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Luas tanah (m²)</span>
+                    <input type="number" name="land" id="f-land" min="0" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" value="0">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Luas bangunan (m²)</span>
+                    <input type="number" name="build" id="f-build" min="0" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" value="0">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Sertifikat</span>
+                    <select name="cert" id="f-cert" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 bg-white focus:ring-brand outline-none">
+                        <option value="SHM">SHM</option>
+                        <option value="HGB">HGB</option>
+                        <option value="Hak Pakai">Hak Pakai</option>
+                    </select>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Agen</span>
+                    <select name="agentId" id="f-agentId" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 bg-white focus:ring-brand outline-none"></select>
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">WhatsApp (62…)</span>
+                    <input type="text" name="whatsapp" id="f-whatsapp" required class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="6281234567890">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Latitude</span>
+                    <input type="text" name="lat" id="f-lat" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="-6.265">
+                </label>
+                <label>
+                    <span class="text-sm font-medium text-slate-700">Longitude</span>
+                    <input type="text" name="lng" id="f-lng" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="106.785">
+                </label>
+                <label class="sm:col-span-2 flex items-center gap-6 flex-wrap">
+                    <span class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" name="nego" id="f-nego" class="rounded border-slate-300 text-brand focus:ring-brand"> <span class="text-sm font-medium text-slate-700">Bisa nego</span></span>
+                    <span class="inline-flex items-center gap-2 cursor-pointer"><input type="checkbox" name="newProperty" id="f-newProperty" class="rounded border-slate-300 text-brand focus:ring-brand"> <span class="text-sm font-medium text-slate-700">Properti baru</span></span>
+                </label>
+                <label class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Foto (satu URL per baris)</span>
+                    <textarea name="images" id="f-images" rows="5" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 font-mono text-sm focus:ring-brand outline-none" placeholder="https://…"></textarea>
+                </label>
+                <label class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Deskripsi (paragraf dipisah baris kosong)</span>
+                    <textarea name="description" id="f-description" rows="6" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Paragraf pertama…"></textarea>
+                </label>
+                <label class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Fasilitas (pisahkan koma)</span>
+                    <input type="text" name="facilities" id="f-facilities" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none" placeholder="Carport, Taman, AC">
+                </label>
+                <label class="sm:col-span-2">
+                    <span class="text-sm font-medium text-slate-700">Catatan cicilan / sewa (opsional)</span>
+                    <input type="text" name="installmentHint" id="f-installmentHint" class="mt-1 w-full py-2.5 px-3 rounded-lg border border-slate-200 focus:ring-brand outline-none">
+                </label>
+            </div>
+
+            <p id="form-error" class="hidden text-sm text-red-600"></p>
+            <div class="flex flex-wrap gap-3 pt-2">
+                <button type="submit" class="inline-flex items-center justify-center bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3 rounded-xl transition">Simpan</button>
+                <a href="listing-saya" class="inline-flex items-center justify-center border border-slate-200 text-slate-700 font-medium px-6 py-3 rounded-xl hover:bg-slate-50">Batal</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+(function () {
+    function formatJuta(n) {
+        if (n == null || n === '' || (typeof n === 'number' && isNaN(n))) return '';
+        var num = typeof n === 'number' ? n : parseJuta(String(n));
+        if (isNaN(num)) return '';
+        return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(num);
+    }
+
+    function parseJuta(str) {
+        if (str == null) return NaN;
+        var s = String(str).trim().replace(/\s/g, '');
+        if (!s) return NaN;
+        s = s.replace(/\./g, '');
+        if (s.indexOf(',') !== -1) s = s.replace(',', '.');
+        var x = parseFloat(s);
+        return isNaN(x) ? NaN : x;
+    }
+
+    function toPriceEditString(n) {
+        if (isNaN(n)) return '';
+        var s = String(n);
+        if (s.indexOf('e') !== -1 || s.indexOf('E') !== -1) return formatJuta(n);
+        return s.replace('.', ',');
+    }
+
+    var priceEl = document.getElementById('f-priceJuta');
+    priceEl.addEventListener('blur', function () {
+        var n = parseJuta(priceEl.value);
+        if (!isNaN(n) && n >= 0) priceEl.value = formatJuta(n);
+    });
+    priceEl.addEventListener('focus', function () {
+        var n = parseJuta(priceEl.value);
+        if (!isNaN(n) && priceEl.value.trim() !== '') priceEl.value = toPriceEditString(n);
+    });
+
+    var sel = document.getElementById('f-agentId');
+    if (window.AGENTS) {
+        window.AGENTS.forEach(function (a) {
+            var o = document.createElement('option');
+            o.value = a.id;
+            o.textContent = a.name + ' — ' + a.city;
+            sel.appendChild(o);
+        });
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var editId = params.get('id');
+    var existing = editId ? window.getListingById(editId) : null;
+
+    if (existing) {
+        document.getElementById('form-title').textContent = 'Edit listing';
+        document.getElementById('f-id').value = existing.id;
+        document.getElementById('f-title').value = existing.title || '';
+        document.getElementById('f-transaction').value = existing.transaction || 'dijual';
+        document.getElementById('f-type').value = existing.type || 'rumah';
+        document.getElementById('f-city').value = existing.city || '';
+        document.getElementById('f-location').value = existing.location || '';
+        document.getElementById('f-address').value = existing.address || '';
+        document.getElementById('f-priceJuta').value = existing.priceJuta != null ? formatJuta(existing.priceJuta) : '';
+        document.getElementById('f-listingCode').value = existing.listingCode || '';
+        document.getElementById('f-beds').value = existing.beds != null ? existing.beds : 0;
+        document.getElementById('f-baths').value = existing.baths != null ? existing.baths : 0;
+        document.getElementById('f-land').value = existing.land != null ? existing.land : 0;
+        document.getElementById('f-build').value = existing.build != null ? existing.build : 0;
+        document.getElementById('f-cert').value = existing.cert || 'SHM';
+        if (existing.agentId) document.getElementById('f-agentId').value = existing.agentId;
+        document.getElementById('f-whatsapp').value = existing.whatsapp || '';
+        document.getElementById('f-lat').value = existing.lat != null ? existing.lat : '';
+        document.getElementById('f-lng').value = existing.lng != null ? existing.lng : '';
+        document.getElementById('f-nego').checked = !!existing.nego;
+        document.getElementById('f-newProperty').checked = !!existing.newProperty;
+        document.getElementById('f-images').value = (window.getListingImages(existing) || []).join('\n');
+        var desc = existing.description;
+        document.getElementById('f-description').value = Array.isArray(desc) ? desc.join('\n\n') : (desc || '');
+        document.getElementById('f-facilities').value = (existing.facilities || []).join(', ');
+        document.getElementById('f-installmentHint').value = existing.installmentHint || '';
+    } else if (sel.options.length) {
+        sel.selectedIndex = 0;
+        var a0 = window.AGENTS && window.AGENTS[0];
+        if (a0 && a0.phone && !document.getElementById('f-whatsapp').value) {
+            document.getElementById('f-whatsapp').value = a0.phone;
+        }
+    }
+
+    function nextId() {
+        var max = 0;
+        window.LISTINGS.forEach(function (p) {
+            var n = parseInt(p.id, 10);
+            if (!isNaN(n) && n > max) max = n;
+        });
+        return String(max + 1);
+    }
+
+    document.getElementById('listing-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var err = document.getElementById('form-error');
+        err.classList.add('hidden');
+
+        var idVal = document.getElementById('f-id').value.trim();
+        if (!idVal) idVal = nextId();
+
+        var imgLines = document.getElementById('f-images').value.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+        var ag = window.getAgentById ? window.getAgentById(document.getElementById('f-agentId').value) : null;
+
+        var descText = document.getElementById('f-description').value.trim();
+        var descArr = descText ? descText.split(/\n\s*\n/).map(function (x) { return x.trim(); }).filter(Boolean) : [''];
+
+        var facStr = document.getElementById('f-facilities').value;
+        var facilities = facStr.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+
+        var obj = {
+            id: idVal,
+            title: document.getElementById('f-title').value.trim(),
+            transaction: document.getElementById('f-transaction').value,
+            type: document.getElementById('f-type').value,
+            city: document.getElementById('f-city').value.trim(),
+            location: document.getElementById('f-location').value.trim(),
+            address: document.getElementById('f-address').value.trim(),
+            priceJuta: parseJuta(document.getElementById('f-priceJuta').value),
+            listingCode: document.getElementById('f-listingCode').value.trim(),
+            beds: parseInt(document.getElementById('f-beds').value, 10) || 0,
+            baths: parseInt(document.getElementById('f-baths').value, 10) || 0,
+            land: parseFloat(document.getElementById('f-land').value, 10) || 0,
+            build: parseFloat(document.getElementById('f-build').value, 10) || 0,
+            cert: document.getElementById('f-cert').value,
+            agentId: document.getElementById('f-agentId').value,
+            agentName: ag ? ag.name : '',
+            whatsapp: document.getElementById('f-whatsapp').value.trim(),
+            lat: parseFloat(document.getElementById('f-lat').value, 10),
+            lng: parseFloat(document.getElementById('f-lng').value, 10),
+            nego: document.getElementById('f-nego').checked,
+            newProperty: document.getElementById('f-newProperty').checked,
+            images: imgLines,
+            description: descArr,
+            facilities: facilities,
+            installmentHint: document.getElementById('f-installmentHint').value.trim(),
+            date: new Date().toISOString().slice(0, 10)
+        };
+
+        if (!obj.images.length) {
+            err.textContent = 'Isi minimal satu URL foto.';
+            err.classList.remove('hidden');
+            return;
+        }
+        obj.image = obj.images[0];
+        if (isNaN(obj.priceJuta) || obj.priceJuta < 0) {
+            err.textContent = 'Harga tidak valid. Gunakan angka (contoh: 850 atau 1.250,5).';
+            err.classList.remove('hidden');
+            return;
+        }
+        document.getElementById('f-priceJuta').value = formatJuta(obj.priceJuta);
+        if (isNaN(obj.lat) || isNaN(obj.lng)) {
+            obj.lat = -6.2;
+            obj.lng = 106.8;
+        }
+
+        try {
+            var raw = localStorage.getItem('portal_listings_user');
+            var arr = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(arr)) arr = [];
+            var idx = arr.findIndex(function (x) { return String(x.id) === String(obj.id); });
+            if (idx >= 0) arr[idx] = obj;
+            else arr.push(obj);
+            localStorage.setItem('portal_listings_user', JSON.stringify(arr));
+        } catch (ex) {
+            err.textContent = 'Gagal menyimpan.';
+            err.classList.remove('hidden');
+            return;
+        }
+
+        window.location.href = 'listing-saya.html';
+    });
+})();
+    </script>
+</body>
+</html>

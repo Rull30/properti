@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Agen | Rumah123</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' } },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+    <script src="/agents-data.js"></script>
+  <script type="module" crossorigin src="/assets/navbar-DGje6dV3.js"></script>
+</head>
+<body class="bg-[#f5f5f5] text-slate-800 antialiased">
+
+    <div data-navbar-host data-navbar-active="cari-agen"></div>
+
+    <div id="not-found" class="hidden max-w-3xl mx-auto px-4 py-20 text-center">
+        <p class="text-lg text-slate-600 mb-4">Agen tidak ditemukan.</p>
+        <a href="cari-agen" class="text-brand font-semibold hover:underline">Kembali ke pencarian agen</a>
+    </div>
+
+    <div id="main-content" class="hidden">
+        <div class="bg-white border-b border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                <nav class="text-sm text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <a href="/" class="hover:text-brand">Beranda</a>
+                    <span class="text-slate-300">/</span>
+                    <a href="cari-agen" class="hover:text-brand">Cari agen</a>
+                    <span class="text-slate-300">/</span>
+                    <span id="bc-name" class="text-slate-800 font-medium"></span>
+                </nav>
+            </div>
+        </div>
+
+        <section class="bg-gradient-to-b from-white to-[#f0f4f8] border-b border-slate-200/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+                    <div id="hero-avatar" class="w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-2xl bg-gradient-to-br from-brand/25 to-brand/5 flex items-center justify-center text-brand font-bold text-3xl sm:text-4xl shadow-inner border border-white"></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <h1 id="agent-name" class="text-2xl sm:text-3xl font-bold text-slate-900"></h1>
+                            <span id="badge-verified" class="hidden text-xs font-bold uppercase tracking-wide text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded">Terverifikasi</span>
+                        </div>
+                        <p id="agent-agency" class="text-lg text-slate-600"></p>
+                        <p id="agent-city" class="text-slate-500 mt-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span></span>
+                        </p>
+                        <div class="flex flex-wrap gap-4 mt-4 text-sm">
+                            <span class="text-slate-600">★ <strong id="stat-rating" class="text-slate-900"></strong> <span id="stat-reviews" class="text-slate-400"></span></span>
+                            <span class="text-slate-600"><strong id="stat-listings" class="text-slate-900"></strong> listing aktif</span>
+                            <span class="text-slate-600"><strong id="stat-years" class="text-slate-900"></strong> tahun pengalaman</span>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-auto md:min-w-[220px] flex flex-col gap-2">
+                        <a id="link-wa" href="#" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654z"/></svg>
+                            WhatsApp
+                        </a>
+                        <a id="link-tel" href="#" class="flex items-center justify-center gap-2 w-full border-2 border-brand text-brand font-bold py-3 px-4 rounded-xl hover:bg-brand-light transition">Telepon</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <section class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+                    <h2 class="text-lg font-bold text-slate-900 mb-3">Tentang agen</h2>
+                    <p id="agent-bio" class="text-slate-600 leading-relaxed text-sm sm:text-base"></p>
+                </section>
+
+                <section class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+                    <h2 class="text-lg font-bold text-slate-900 mb-3">Spesialisasi</h2>
+                    <div id="spec-chips" class="flex flex-wrap gap-2"></div>
+                </section>
+
+                <section class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+                    <h2 class="text-lg font-bold text-slate-900 mb-3">Area layanan</h2>
+                    <ul id="area-list" class="list-disc list-inside text-slate-600 text-sm space-y-1"></ul>
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-bold text-slate-900 mb-4">Listing dari agen ini</h2>
+                    <div id="listing-grid" class="grid sm:grid-cols-2 gap-4"></div>
+                    <p id="no-listings" class="hidden text-sm text-slate-500 py-6">Belum ada listing yang ditampilkan.</p>
+                </section>
+            </div>
+
+            <aside class="lg:col-span-1">
+                <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm lg:sticky lg:top-24 space-y-4">
+                    <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Kontak</h2>
+                    <div>
+                        <p class="text-xs text-slate-500">Email</p>
+                        <a id="agent-email" href="#" class="text-brand font-medium break-all hover:underline"></a>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500">Bergabung sejak</p>
+                        <p id="agent-join" class="text-slate-800 font-medium"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500">ID agen</p>
+                        <p id="agent-id" class="font-mono text-sm text-slate-600"></p>
+                    </div>
+                    <a href="cari-agen" class="block text-center text-sm text-slate-600 hover:text-brand pt-2 border-t border-slate-100">← Cari agen lain</a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-300 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <p class="text-center text-sm text-slate-500">&copy; 2026 Demo Portal Properti · <a href="/" class="text-brand hover:underline">Beranda</a></p>
+        </div>
+    </footer>
+
+    <script>
+(function () {
+    function specLabel(s) {
+        var m = { rumah: 'Rumah', apartemen: 'Apartemen', ruko: 'Ruko', tanah: 'Tanah', villa: 'Villa', komersial: 'Komersial', mewah: 'Properti mewah' };
+        return m[s] || s;
+    }
+
+    function escapeHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    function formatJoin(d) {
+        if (!d) return '—';
+        try {
+            var dt = new Date(d);
+            return dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        } catch (e) { return d; }
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var id = params.get('id');
+    var a = typeof getAgentById === 'function' ? getAgentById(id) : null;
+
+    if (!a) {
+        document.getElementById('not-found').classList.remove('hidden');
+        document.title = 'Agen tidak ditemukan | Rumah123';
+        return;
+    }
+
+    document.title = a.name + ' — Agen | Rumah123';
+    document.getElementById('main-content').classList.remove('hidden');
+
+    var initials = a.name.split(/\s+/).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase();
+    document.getElementById('hero-avatar').textContent = initials;
+    document.getElementById('bc-name').textContent = a.name;
+    document.getElementById('agent-name').textContent = a.name;
+    document.getElementById('agent-agency').textContent = a.agency;
+    document.getElementById('agent-city').querySelector('span').textContent = a.city;
+
+    if (a.verified) document.getElementById('badge-verified').classList.remove('hidden');
+
+    document.getElementById('stat-rating').textContent = a.rating;
+    document.getElementById('stat-reviews').textContent = '(' + a.reviewCount + ' ulasan)';
+    document.getElementById('stat-listings').textContent = a.listingCount;
+    document.getElementById('stat-years').textContent = a.yearsExp;
+
+    document.getElementById('agent-bio').textContent = a.bio;
+
+    var chips = document.getElementById('spec-chips');
+    a.specialties.forEach(function (s) {
+        var sp = document.createElement('span');
+        sp.className = 'px-3 py-1.5 bg-brand-light text-brand text-sm font-medium rounded-full border border-red-100';
+        sp.textContent = specLabel(s);
+        chips.appendChild(sp);
+    });
+
+    var ul = document.getElementById('area-list');
+    a.areas.forEach(function (ar) {
+        var li = document.createElement('li');
+        li.textContent = ar;
+        ul.appendChild(li);
+    });
+
+    document.getElementById('agent-email').textContent = a.email;
+    document.getElementById('agent-email').href = 'mailto:' + encodeURIComponent(a.email);
+    document.getElementById('agent-join').textContent = formatJoin(a.joinDate);
+    document.getElementById('agent-id').textContent = 'AGN-' + a.id;
+
+    var phone = a.phone.replace(/\D/g, '');
+    document.getElementById('link-wa').href = 'https://wa.me/' + phone + '?text=' + encodeURIComponent('Halo ' + a.name + ', saya tertarik dengan listing Anda di Rumah123.');
+    document.getElementById('link-tel').href = 'tel:+' + phone;
+
+    var grid = document.getElementById('listing-grid');
+    var noL = document.getElementById('no-listings');
+    if (!a.listings || !a.listings.length) {
+        noL.classList.remove('hidden');
+    } else {
+        a.listings.forEach(function (L) {
+            var el = document.createElement('a');
+            el.href = L.url || '#';
+            el.className = 'group flex bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition';
+            el.innerHTML =
+                '<div class="w-28 sm:w-32 shrink-0 bg-slate-100">' +
+                '<img src="' + escapeHtml(L.img) + '" alt="" class="w-full h-full object-cover min-h-[100px] group-hover:scale-105 transition duration-300">' +
+                '</div>' +
+                '<div class="p-3 min-w-0">' +
+                '<p class="font-bold text-brand text-sm">' + escapeHtml(L.price) + '</p>' +
+                '<p class="font-semibold text-slate-900 text-sm line-clamp-2 mt-0.5">' + escapeHtml(L.title) + '</p>' +
+                '<p class="text-xs text-slate-500 mt-1 line-clamp-1">' + escapeHtml(L.loc) + '</p>' +
+                '</div>';
+            grid.appendChild(el);
+        });
+    }
+})();
+    </script>
+</body>
+</html>

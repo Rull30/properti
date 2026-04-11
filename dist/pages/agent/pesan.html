@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesan | Rumah123 Agen</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#E02020', dark: '#C41E1E', light: '#FFF5F5' } },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                },
+            },
+        };
+    </script>
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+    <script src="auth.js"></script>
+</head>
+<body class="bg-[#f0f2f5] text-slate-800 min-h-screen antialiased">
+    <script>
+        (function () {
+            if (typeof AgentAuth === 'undefined') { window.location.href = 'login.html'; return; }
+            if (!AgentAuth.isLoggedIn()) { window.location.href = 'login.html'; }
+        })();
+    </script>
+
+    <div class="min-h-screen flex">
+        <aside class="hidden md:flex w-56 lg:w-64 bg-slate-900 text-slate-300 flex-col shrink-0">
+            <div class="p-5 border-b border-slate-700/80">
+                <div class="flex items-baseline gap-1">
+                    <span class="text-xl font-bold text-brand">Rumah</span>
+                    <span class="text-xl font-bold text-white">123</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">Panel agen</p>
+            </div>
+            <nav class="flex-1 p-3 space-y-1">
+                <a href="dashboard" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Dashboard</a>
+                <a href="listing-saya" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Listing saya</a>
+                <a href="pesan" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Pesan</a>
+                <a href="profil" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Profil</a>
+            </nav>
+            <div class="p-3 border-t border-slate-700/80">
+                <a href="/" class="block text-xs text-slate-500 hover:text-white px-3 py-2">← Situs publik</a>
+                <button type="button" id="btn-logout" class="mt-2 w-full text-left px-3 py-2 text-sm text-red-400 hover:text-red-300 rounded-lg hover:bg-white/5">Keluar</button>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col min-w-0">
+            <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold text-slate-900">Pesan</h1>
+                        <p class="text-sm text-slate-500">Percakapan dari calon pembeli (demo)</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="agent-badge" class="hidden sm:inline text-sm text-slate-600 truncate max-w-[200px]"></span>
+                        <button type="button" id="btn-logout-mobile" class="md:hidden text-sm font-medium text-brand">Keluar</button>
+                    </div>
+                </div>
+                <nav class="md:hidden mt-4 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 text-sm">
+                    <a href="dashboard" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Dashboard</a>
+                    <a href="listing-saya" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Listing</a>
+                    <a href="pesan" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Pesan</a>
+                    <a href="profil" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Profil</a>
+                </nav>
+            </header>
+
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto">
+                <div class="space-y-3" id="thread-list"></div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+(function () {
+    if (!AgentAuth.isLoggedIn()) return;
+    document.getElementById('agent-badge').textContent = AgentAuth.getEmail();
+
+    var THREADS = [
+        { id: 1, name: 'Andi W.', listing: 'Rumah minimalis Pondok Indah', preview: 'Apakah masih bisa nego untuk cash keras?', time: '10:42', unread: true },
+        { id: 2, name: 'Maya K.', listing: 'Apartemen Cilandak', preview: 'Bisa survey akhir pekan ini?', time: 'Kemarin', unread: true },
+        { id: 3, name: 'Rudi H.', listing: 'Tanah Cakung', preview: 'Terima kasih infonya.', time: '2 hari lalu', unread: false },
+        { id: 4, name: 'Lina S.', listing: 'Rumah minimalis Pondok Indah', preview: 'Saya kirim dokumen via email.', time: '5 hari lalu', unread: false }
+    ];
+
+    var list = document.getElementById('thread-list');
+    THREADS.forEach(function (t) {
+        var a = document.createElement('a');
+        a.href = '#';
+        a.className = 'block bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:border-brand/30 hover:shadow-md transition';
+        a.innerHTML =
+            '<div class="flex gap-3">' +
+            '<div class="w-11 h-11 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-sm shrink-0">' + t.name.charAt(0) + '</div>' +
+            '<div class="min-w-0 flex-1">' +
+            '<div class="flex justify-between gap-2 items-start">' +
+            '<p class="font-semibold text-slate-900">' + t.name + (t.unread ? ' <span class="inline-block w-2 h-2 rounded-full bg-brand align-middle ml-1" title="Belum dibaca"></span>' : '') + '</p>' +
+            '<span class="text-xs text-slate-400 shrink-0">' + t.time + '</span>' +
+            '</div>' +
+            '<p class="text-xs text-slate-500 mt-0.5">' + t.listing + '</p>' +
+            '<p class="text-sm text-slate-600 mt-2 line-clamp-2">' + t.preview + '</p>' +
+            '</div></div>';
+        a.addEventListener('click', function (e) {
+            e.preventDefault();
+            alert('Demo: percakapan penuh belum dihubungkan ke backend.');
+        });
+        list.appendChild(a);
+    });
+
+    function doLogout() {
+        AgentAuth.logout();
+        window.location.href = 'login.html';
+    }
+    document.getElementById('btn-logout').addEventListener('click', doLogout);
+    document.getElementById('btn-logout-mobile').addEventListener('click', doLogout);
+})();
+    </script>
+</body>
+</html>
