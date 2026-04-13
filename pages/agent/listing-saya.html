@@ -171,7 +171,7 @@
             return;
         }
         empty.classList.add('hidden');
-        var detailBase = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl : function (id) { return '../properti-detail?id=' + encodeURIComponent(id); };
+        var detailBase = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl : function (id) { return '../properti-detail.html?id=' + encodeURIComponent(id); };
         list.forEach(function (r) {
             var tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50/80';
