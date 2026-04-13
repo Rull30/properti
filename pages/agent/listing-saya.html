@@ -42,13 +42,13 @@
                 <p class="text-xs text-slate-500 mt-1">Panel agen</p>
             </div>
             <nav class="flex-1 p-3 space-y-1">
-                <a href="dashboard.html" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Dashboard</a>
-                <a href="listing-saya.html" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Listing saya</a>
-                <a href="pesan.html" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Pesan</a>
-                <a href="profil.html" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Profil</a>
+                <a href="dashboard" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Dashboard</a>
+                <a href="listing-saya" class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium text-sm">Listing saya</a>
+                <a href="pesan" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Pesan</a>
+                <a href="profil" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/5 text-sm transition">Profil</a>
             </nav>
             <div class="p-3 border-t border-slate-700/80">
-                <a href="../index.html" class="block text-xs text-slate-500 hover:text-white px-3 py-2">← Situs publik</a>
+                <a href="/" class="block text-xs text-slate-500 hover:text-white px-3 py-2">← Situs publik</a>
                 <button type="button" id="btn-logout" class="mt-2 w-full text-left px-3 py-2 text-sm text-red-400 hover:text-red-300 rounded-lg hover:bg-white/5">Keluar</button>
             </div>
         </aside>
@@ -66,10 +66,10 @@
                     </div>
                 </div>
                 <nav class="md:hidden mt-4 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 text-sm">
-                    <a href="dashboard.html" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Dashboard</a>
-                    <a href="listing-saya.html" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Listing</a>
-                    <a href="pesan.html" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Pesan</a>
-                    <a href="profil.html" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Profil</a>
+                    <a href="dashboard" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Dashboard</a>
+                    <a href="listing-saya" class="shrink-0 px-3 py-1.5 rounded-lg bg-brand text-white font-medium">Listing</a>
+                    <a href="pesan" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Pesan</a>
+                    <a href="profil" class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">Profil</a>
                 </nav>
             </header>
 
@@ -81,7 +81,7 @@
                         <button type="button" data-filter="tayang" class="filter-tab px-4 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200 text-slate-700 hover:border-brand/40">Tayang</button>
                         <button type="button" data-filter="draft" class="filter-tab px-4 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200 text-slate-700 hover:border-brand/40">Draft</button>
                     </div>
-                    <a href="listing-form.html" class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition">
+                    <a href="listing-form" class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition">
                         + Listing baru
                     </a>
                 </div>
@@ -126,6 +126,24 @@
         return d.innerHTML;
     }
 
+    function formatCompactPrice(p) {
+        var juta = Number(p && p.priceJuta);
+        if (!isFinite(juta) || juta < 0) return '—';
+        var rupiah = juta * 1000000;
+        var suffix = p && p.transaction === 'disewa' ? ' / tahun' : '';
+
+        function trim2(n) {
+            var v = Math.round(n * 100) / 100;
+            return String(v).replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
+        }
+
+        if (rupiah >= 1e12) return 'Rp ' + trim2(rupiah / 1e12) + ' Triliun' + suffix;
+        if (rupiah >= 1e9) return 'Rp ' + trim2(rupiah / 1e9) + ' Miliar' + suffix;
+        if (rupiah >= 1e6) return 'Rp ' + trim2(rupiah / 1e6) + ' Juta' + suffix;
+        if (rupiah >= 1e3) return 'Rp ' + trim2(rupiah / 1e3) + ' Ribu' + suffix;
+        return 'Rp ' + Math.round(rupiah).toLocaleString('id-ID') + suffix;
+    }
+
     function render(filter) {
         var body = document.getElementById('listing-body');
         var empty = document.getElementById('listing-empty');
@@ -138,7 +156,8 @@
             return {
                 id: p.id,
                 title: p.title,
-                price: window.formatListingPrice(p),
+                price: formatCompactPrice(p),
+                pricePerM2: p.type === 'tanah' && p.pricePerM2 ? p.pricePerM2 : null,
                 status: status,
                 views: views,
                 filter: filt
@@ -152,19 +171,19 @@
             return;
         }
         empty.classList.add('hidden');
-        var detailBase = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl : function (id) { return '../properti-detail.html?id=' + encodeURIComponent(id); };
+        var detailBase = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl : function (id) { return '../properti-detail?id=' + encodeURIComponent(id); };
         list.forEach(function (r) {
             var tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50/80';
             var detail = detailBase(r.id);
             tr.innerHTML =
                 '<td class="px-4 py-3"><p class="font-medium text-slate-900">' + esc(r.title) + '</p><p class="text-xs text-slate-400 mt-0.5">ID: LST-' + esc(r.id) + '</p></td>' +
-                '<td class="px-4 py-3 text-slate-800 whitespace-nowrap">' + esc(r.price) + '</td>' +
+                '<td class="px-4 py-3 text-slate-800 whitespace-nowrap">' + esc(r.price) + (r.pricePerM2 ? '<div class="text-xs text-slate-500 mt-0.5">Rp ' + esc(Number(r.pricePerM2).toLocaleString('id-ID')) + ' / m²</div>' : '') + '</td>' +
                 '<td class="px-4 py-3">' + badgeStatus(r.status) + '</td>' +
                 '<td class="px-4 py-3 text-slate-600">' + r.views.toLocaleString('id-ID') + '</td>' +
                 '<td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">' +
                 '<a href="' + esc(detail) + '" class="text-brand font-medium hover:underline">Lihat</a>' +
-                '<a href="listing-form.html?id=' + encodeURIComponent(r.id) + '" class="text-slate-500 hover:text-slate-800">Edit</a>' +
+                '<a href="listing-form?id=' + encodeURIComponent(r.id) + '" class="text-slate-500 hover:text-slate-800">Edit</a>' +
                 '</td>';
             body.appendChild(tr);
         });

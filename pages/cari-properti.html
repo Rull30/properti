@@ -32,29 +32,13 @@
 </head>
 <body class="bg-[#f5f5f5] text-slate-800 antialiased">
 
-    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex h-14 sm:h-16 items-center justify-between gap-4">
-                <a href="index.html" class="flex items-center gap-1 shrink-0">
-                    <span class="text-2xl sm:text-[1.65rem] font-bold tracking-tight text-brand">Dunia</span>
-                    <span class="text-2xl sm:text-[1.65rem] font-bold tracking-tight text-slate-900">Rumah</span>
-                    <span class="text-2xl sm:text-[1.65rem] font-bold tracking-tight text-brand">Pro</span>
-                </a>
-                <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
-                    <a href="cari-properti.html" class="text-brand font-semibold">Carikan Properti</a>
-                    <a href="peta-properti.html" class="hover:text-brand transition">Peta</a>
-                    <a href="cari-agen.html" class="hover:text-brand transition">Cari Agen</a>
-                    <a href="kalkulator-kpr.html" class="hover:text-brand transition">Kalkulator KPR</a>
-                </nav>
-            </div>
-        </div>
-    </header>
+    <div data-navbar-host data-navbar-active="cari-properti"></div>
 
     <!-- Bar pencarian utama -->
     <section class="bg-white border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
             <h1 class="text-xl sm:text-2xl font-bold text-slate-900 mb-4">Carikan properti</h1>
-            <form id="form-search" class="space-y-4" action="cari-properti.html" method="get">
+            <form id="form-search" class="space-y-4" action="cari-properti" method="get">
                 <div class="flex flex-col lg:flex-row gap-3 lg:items-end">
                     <div class="flex-1 min-w-0">
                         <label for="inp-q" class="block text-xs font-medium text-slate-500 mb-1">Kata kunci</label>
@@ -222,14 +206,10 @@
         </div>
     </div>
 
-    <footer class="bg-slate-900 text-slate-300 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <p class="text-center text-sm text-slate-500">&copy; 2026 Demo Portal Properti · <a href="index.html" class="text-brand hover:underline">Beranda</a></p>
-        </div>
-    </footer>
+    <div data-footer-host></div>
 
-    <script src="listings-data.js"></script>
-    <script src="listings-user-storage.js"></script>
+    <script src="/listings-data.js"></script>
+    <script src="/listings-user-storage.js"></script>
     <script>
 (function () {
     var LISTINGS = window.LISTINGS;
@@ -384,7 +364,7 @@
         if (state.sort && state.sort !== 'newest') params.set('urut', state.sort);
         if (state.page > 1) params.set('hal', String(state.page));
         var qs = params.toString();
-        var url = 'cari-properti.html' + (qs ? '?' + qs : '');
+        var url = '/cari-properti' + (qs ? '?' + qs : '');
         if (history.replaceState) history.replaceState(null, '', url);
     }
 
@@ -645,5 +625,7 @@
     render();
 })();
     </script>
+    <script type="module" src="/src/navbar.js"></script>
+    <script type="module" src="/src/footer.js"></script>
 </body>
 </html>

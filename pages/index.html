@@ -30,34 +30,56 @@
         body { font-family: 'Inter', system-ui, sans-serif; }
         .tab-active { background: #fff; color: #E02020; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
         .tab-inactive { color: #64748b; }
+        .home-carousel-slide { opacity: 0; pointer-events: none; transition: opacity .5s ease; }
+        .home-carousel-slide.active { opacity: 1; pointer-events: auto; }
+        .home-carousel-dot.active { background-color: #ffffff; transform: scale(1.05); }
     </style>
 </head>
 <body class="bg-[#f5f5f5] text-slate-800 antialiased">
 
     <!-- Header utama -->
-    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex h-14 sm:h-16 items-center justify-between gap-4">
-                <a href="index.html" class="flex items-center gap-1 shrink-0">
-                    <span class="text-2xl sm:text-[1.65rem] font-bold tracking-tight text-brand">Dunia</span>
-                    <span class="text-2xl sm:text-[1.65rem] font-bold tracking-tight text-slate-900">Rumah</span>
-                    <span class="text-2xl sm:text-[1.65rem] font-bold tracking-tight text-brand">Pro</span>
-                </a>
-                <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
-                    <a href="cari-properti.html" class="hover:text-brand transition">Carikan Properti</a>
-                    <a href="peta-properti.html" class="hover:text-brand transition">Peta</a>
-                    <a href="cari-agen.html" class="hover:text-brand transition">Cari Agen</a>
-                    <a href="kalkulator-kpr.html" class="hover:text-brand transition">Kalkulator KPR</a>
-                </nav>
-                <button type="button" class="lg:hidden p-2 text-slate-600 hover:text-brand ml-auto" aria-label="Menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </button>
-            </div>
+    <div data-navbar-host data-navbar-active=""></div>
+
+    <!-- Carousel -->
+    <section class="w-full px-2 sm:px-4 mt-2 mb-8">
+        <div id="home-carousel" class="relative w-full h-[25rem] rounded-2xl overflow-hidden bg-slate-200 shadow-sm">
+            <a href="cari-properti?transaksi=dijual" class="home-carousel-slide active absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?auto=format&fit=crop&w=1600&q=80" alt="Promo properti dijual" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/65 via-black/30 to-transparent"></div>
+                <div class="absolute left-6 sm:left-10 bottom-8 sm:bottom-10 text-white max-w-xl">
+                    <p class="text-xs sm:text-sm font-semibold uppercase tracking-wide text-brand-light">Pilihan terbaik</p>
+                    <h2 class="text-2xl sm:text-4xl font-bold leading-tight mt-1">Temukan rumah impian di lokasi favoritmu</h2>
+                    <p class="text-sm sm:text-base text-white/90 mt-2">Lihat listing terbaru dengan harga kompetitif dan data yang terus diperbarui.</p>
+                </div>
+            </a>
+            <a href="kalkulator-kpr" class="home-carousel-slide absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80" alt="Hitung simulasi KPR" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/35 to-transparent"></div>
+                <div class="absolute left-6 sm:left-10 bottom-8 sm:bottom-10 text-white max-w-xl">
+                    <p class="text-xs sm:text-sm font-semibold uppercase tracking-wide text-brand-light">Cicilan lebih pasti</p>
+                    <h2 class="text-2xl sm:text-4xl font-bold leading-tight mt-1">Simulasikan KPR sebelum memilih properti</h2>
+                    <p class="text-sm sm:text-base text-white/90 mt-2">Bandingkan skema pembiayaan agar keputusan beli jadi lebih yakin.</p>
+                </div>
+            </a>
+            <a href="peta-properti" class="home-carousel-slide absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80" alt="Jelajahi properti dari peta" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/65 via-black/30 to-transparent"></div>
+                <div class="absolute left-6 sm:left-10 bottom-8 sm:bottom-10 text-white max-w-xl">
+                    <p class="text-xs sm:text-sm font-semibold uppercase tracking-wide text-brand-light">Peta interaktif</p>
+                    <h2 class="text-2xl sm:text-4xl font-bold leading-tight mt-1">Cari properti lebih cepat lewat peta</h2>
+                    <p class="text-sm sm:text-base text-white/90 mt-2">Jelajahi area strategis dan lihat listing berdasarkan lokasi secara langsung.</p>
+                </div>
+            </a>
+
+            <button type="button" id="home-carousel-prev" class="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/35 hover:bg-black/55 text-white grid place-items-center transition" aria-label="Slide sebelumnya">‹</button>
+            <button type="button" id="home-carousel-next" class="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/35 hover:bg-black/55 text-white grid place-items-center transition" aria-label="Slide berikutnya">›</button>
+
+            <div id="home-carousel-dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2"></div>
         </div>
-    </header>
+    </section>
 
     <!-- Hero + pencarian -->
-    <section class="relative bg-gradient-to-b from-white to-[#f0f4f8] pt-8 pb-12 sm:pt-10 sm:pb-16 border-b border-slate-200/60">
+    <section class=" bg-gradient-to-b from-white to-[#f0f4f8] pt-8 pb-12 sm:pt-10 sm:pb-16 border-b border-slate-200/60">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2">
                 Jual Beli dan Sewa Properti Jadi Mudah
@@ -72,7 +94,7 @@
             </div>
 
             <!-- Kotak pencarian -->
-            <form action="cari-properti.html" method="get" id="home-search-form" class="bg-white rounded-2xl shadow-lg border border-slate-100 p-4 sm:p-5 text-left max-w-3xl mx-auto">
+            <form action="cari-properti" method="get" id="home-search-form" class="bg-white rounded-2xl shadow-lg border border-slate-100 p-4 sm:p-5 text-left max-w-3xl mx-auto">
                 <input type="hidden" name="transaksi" id="home-trans" value="dijual">
                 <div class="flex flex-col sm:flex-row gap-3">
                     <div class="flex-1 relative">
@@ -91,12 +113,12 @@
                         <span id="btn-use-location-label">Gunakan lokasi saat ini</span>
                     </button>
                     <span class="hidden sm:inline text-slate-300">|</span>
-                    <a href="cari-properti.html" class="text-slate-600 hover:text-brand font-medium">Filter lanjutan</a>
+                    <a href="cari-properti" class="text-slate-600 hover:text-brand font-medium">Filter lanjutan</a>
                 </div>
                 <div class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap gap-2">
                     <span class="text-xs text-slate-500 w-full sm:w-auto mb-1 sm:mb-0">Penawaran khusus:</span>
-                    <a href="cari-properti.html?transaksi=dijual&harga_max=1000&urut=price_asc" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Di bawah NJOP</a>
-                    <a href="cari-properti.html?transaksi=dijual&urut=price_asc" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Turun harga</a>
+                    <a href="cari-properti?transaksi=dijual&harga_max=1000&urut=price_asc" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Di bawah NJOP</a>
+                    <a href="cari-properti?transaksi=dijual&urut=price_asc" class="text-xs bg-brand-light text-brand px-3 py-1 rounded-full font-medium hover:bg-red-100">Turun harga</a>
                 </div>
             </form>
         </div>
@@ -104,7 +126,7 @@
 
     <!-- Banner promo peta (strip) -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-10 relative z-10">
-        <a href="peta-properti.html" class="group block rounded-xl bg-slate-800 text-white px-4 sm:px-6 py-4 sm:py-5 shadow-md hover:bg-slate-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2">
+        <a href="peta-properti" class="group block rounded-xl bg-slate-800 text-white px-4 sm:px-6 py-4 sm:py-5 shadow-md hover:bg-slate-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2">
             <p class="text-sm sm:text-base font-medium text-center flex flex-wrap items-center justify-center gap-2">
                 <svg class="w-5 h-5 shrink-0 text-brand opacity-90 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
                 <span>Jelajahi properti di kota favoritmu lewat peta interaktif.</span>
@@ -120,10 +142,10 @@
             <button type="button" id="btn-random-popular-searches" class="text-sm text-brand font-semibold hover:underline self-start sm:self-auto">Acak pencarian</button>
         </div>
         <div id="popular-search-chips" class="flex flex-wrap gap-2">
-            <a href="cari-properti.html?q=Rumah&transaksi=dijual&kota=Jakarta%20Selatan" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Rumah Dijual Jakarta Selatan</a>
-            <a href="cari-properti.html?q=Apartemen&transaksi=disewa&kota=Bandung" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Apartemen Disewa Bandung</a>
-            <a href="cari-properti.html?q=Tanah&transaksi=dijual&kota=Surabaya" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Tanah Dijual Surabaya</a>
-            <a href="cari-properti.html?q=Ruko&kota=Tangerang" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Ruko Tangerang</a>
+            <a href="cari-properti?q=Rumah&transaksi=dijual&kota=Jakarta%20Selatan" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Rumah Dijual Jakarta Selatan</a>
+            <a href="cari-properti?q=Apartemen&transaksi=disewa&kota=Bandung" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Apartemen Disewa Bandung</a>
+            <a href="cari-properti?q=Tanah&transaksi=dijual&kota=Surabaya" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Tanah Dijual Surabaya</a>
+            <a href="cari-properti?q=Ruko&kota=Tangerang" class="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:border-brand hover:text-brand transition shadow-sm">Ruko Tangerang</a>
         </div>
     </section>
 
@@ -133,19 +155,19 @@
             <h2 class="text-xl font-bold text-slate-900 text-center mb-2">Banyak fitur bantu kamu dapat properti impian</h2>
             <p class="text-slate-500 text-center text-sm mb-8">Simulasi KPR, panduan, dan lainnya</p>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <a href="kalkulator-kpr.html" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                <a href="kalkulator-kpr" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
                     <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">KPR</div>
                     <span class="text-sm font-semibold text-slate-800">Simulasi KPR</span>
                 </a>
-                <a href="take-over-kpr.html" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                <a href="take-over-kpr" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
                     <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">%</div>
                     <span class="text-sm font-semibold text-slate-800">Take Over KPR</span>
                 </a>
-                <a href="tanya-forum.html" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                <a href="tanya-forum" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
                     <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">?</div>
                     <span class="text-sm font-semibold text-slate-800">Tanya forum</span>
                 </a>
-                <a href="panduan-beli.html" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
+                <a href="panduan-beli" class="rounded-xl border border-slate-200 p-4 text-center hover:border-brand hover:shadow-md transition bg-[#fafafa]">
                     <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-sm">★</div>
                     <span class="text-sm font-semibold text-slate-800">Panduan beli</span>
                 </a>
@@ -160,7 +182,7 @@
                 <h2 class="text-2xl font-bold text-slate-900">Properti pilihan kami</h2>
                 <p class="text-slate-500 mt-1 text-sm sm:text-base">Rekomendasi properti terbaik beserta informasi lengkapnya.</p>
             </div>
-            <a href="cari-properti.html" class="text-brand font-semibold hover:underline shrink-0">Lihat semua →</a>
+            <a href="cari-properti" class="text-brand font-semibold hover:underline shrink-0">Lihat semua →</a>
         </div>
 
         <div id="home-featured-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -183,66 +205,95 @@
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-900 mb-2">Beli properti aman</h3>
                     <p class="text-sm text-slate-600 mb-4">Bantu temukan hunian idaman dengan data yang transparan.</p>
-                    <a href="beli-properti-aman.html" class="text-brand text-sm font-semibold hover:underline">Cari properti →</a>
+                    <a href="beli-properti-aman" class="text-brand text-sm font-semibold hover:underline">Cari properti →</a>
                 </div>
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-900 mb-2">Listing oleh agen</h3>
                     <p class="text-sm text-slate-600 mb-4">Pengunggahan properti hanya melalui agen terverifikasi agar informasi tetap akurat dan konsisten.</p>
-                    <a href="cari-agen.html" class="text-brand text-sm font-semibold hover:underline">Cari agen →</a>
+                    <a href="cari-agen" class="text-brand text-sm font-semibold hover:underline">Cari agen →</a>
                 </div>
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-900 mb-2">Mitra terpercaya</h3>
                     <p class="text-sm text-slate-600 mb-4">Agen dan pengembang terverifikasi untuk ketenangan Anda.</p>
-                    <a href="mitra-terpercaya.html" class="text-brand text-sm font-semibold hover:underline">Pelajari lebih lanjut →</a>
+                    <a href="mitra-terpercaya" class="text-brand text-sm font-semibold hover:underline">Pelajari lebih lanjut →</a>
                 </div>
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-900 mb-2">Info KPR lengkap</h3>
                     <p class="text-sm text-slate-600 mb-4">Simulasi cicilan dan bandingkan bank favorit Anda.</p>
-                    <a href="kalkulator-kpr.html" class="text-brand text-sm font-semibold hover:underline">Hitung KPR →</a>
+                    <a href="kalkulator-kpr" class="text-brand text-sm font-semibold hover:underline">Hitung KPR →</a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
-                <div>
-                    <p class="text-white font-bold text-lg mb-3"><span class="text-brand">Dunia</span>Rumah<span class="text-brand">Pro</span></p>
-                    <p class="text-sm leading-relaxed">Portal jual beli dan sewa properti.</p>
-                </div>
-                <div>
-                    <p class="text-white font-semibold mb-3">Properti</p>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-white">Dijual</a></li>
-                        <li><a href="#" class="hover:text-white">Disewa</a></li>
-                        <li><a href="#" class="hover:text-white">Properti baru</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="text-white font-semibold mb-3">Layanan</p>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="kalkulator-kpr.html" class="hover:text-white">Kalkulator KPR</a></li>
-                        <li><a href="cari-agen.html" class="hover:text-white">Cari agen</a></li>
-                        <li><a href="#" class="hover:text-white">Artikel properti</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="text-white font-semibold mb-3">Kontak</p>
-                    <p class="text-sm">Email: info@contoh.com</p>
-                    <p class="text-sm mt-2">Layanan pengaduan konsumen sesuai ketentuan yang berlaku.</p>
-                </div>
-            </div>
-            <div class="border-t border-slate-700 pt-8 text-center text-sm text-slate-500">
-                <p>&copy; 2026 Demo Portal Properti. Tampilan inspirasi dari layout umum portal properti Indonesia.</p>
-            </div>
-        </div>
-    </footer>
+    <div data-footer-host></div>
 
-    <script src="listings-data.js"></script>
-    <script src="listings-user-storage.js"></script>
+    <script src="/agents-data.js"></script>
+    <script src="/listings-data.js"></script>
+    <script src="/listings-user-storage.js"></script>
     <script>
+    (function () {
+        var root = document.getElementById('home-carousel');
+        if (!root) return;
+        var slides = Array.prototype.slice.call(root.querySelectorAll('.home-carousel-slide'));
+        var prev = document.getElementById('home-carousel-prev');
+        var next = document.getElementById('home-carousel-next');
+        var dotsWrap = document.getElementById('home-carousel-dots');
+        if (!slides.length || !prev || !next || !dotsWrap) return;
+
+        var current = 0;
+        var timer = null;
+
+        function renderDots() {
+            dotsWrap.innerHTML = slides.map(function (_, idx) {
+                var active = idx === current ? ' active' : '';
+                return '<button type="button" class="home-carousel-dot' + active + ' w-2.5 h-2.5 rounded-full bg-white/60 hover:bg-white transition" aria-label="Pilih slide ' + String(idx + 1) + '" data-index="' + String(idx) + '"></button>';
+            }).join('');
+        }
+
+        function renderSlides() {
+            slides.forEach(function (slide, idx) {
+                slide.classList.toggle('active', idx === current);
+            });
+            renderDots();
+        }
+
+        function goTo(index) {
+            current = (index + slides.length) % slides.length;
+            renderSlides();
+        }
+
+        function startAuto() {
+            if (timer) clearInterval(timer);
+            timer = setInterval(function () {
+                goTo(current + 1);
+            }, 5500);
+        }
+
+        prev.addEventListener('click', function () {
+            goTo(current - 1);
+            startAuto();
+        });
+
+        next.addEventListener('click', function () {
+            goTo(current + 1);
+            startAuto();
+        });
+
+        dotsWrap.addEventListener('click', function (ev) {
+            var target = ev.target;
+            if (!target || !target.matches('button[data-index]')) return;
+            var idx = parseInt(target.getAttribute('data-index'), 10);
+            if (Number.isNaN(idx)) return;
+            goTo(idx);
+            startAuto();
+        });
+
+        renderSlides();
+        startAuto();
+    })();
+
     (function () {
         var grid = document.getElementById('home-featured-grid');
         var pop = document.getElementById('home-popular-projects');
@@ -253,6 +304,23 @@
             var d = document.createElement('div');
             d.textContent = s;
             return d.innerHTML;
+        }
+
+        function buildWhatsAppHref(p) {
+            var waNumber = String(p.whatsapp || '');
+            if (typeof window.getAgentById === 'function' && p && p.agentId != null) {
+                var agent = window.getAgentById(p.agentId);
+                if (agent && agent.phone) waNumber = String(agent.phone);
+            }
+            var detailPath = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl(p.id) : p.detailUrl;
+            var detailUrl = '';
+            try {
+                detailUrl = new URL(detailPath, window.location.origin).href;
+            } catch (e) {
+                detailUrl = detailPath || '';
+            }
+            var msg = 'permisi, saya tertarik dengan properti ini.\n\nLink detail properti:\n' + detailUrl;
+            return 'https://wa.me/' + encodeURIComponent(waNumber) + '?text=' + encodeURIComponent(msg);
         }
 
         if (grid && L && L.length && typeof fmtHome === 'function') {
@@ -281,7 +349,7 @@
                 '<div class="flex justify-between text-sm text-slate-600 border-t border-slate-100 pt-3">' + spec + '</div></div></a>' +
                 '<div class="px-4 pb-4 flex items-center justify-between border-t border-slate-100 pt-3">' +
                 '<span class="text-sm text-slate-600">' + esc(p.agentName) + '</span>' +
-                '<a href="https://wa.me/' + esc(p.whatsapp) + '" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-white bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded-lg">WhatsApp</a></div>';
+                '<a href="' + esc(buildWhatsAppHref(p)) + '" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-white bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded-lg">WhatsApp</a></div>';
             grid.appendChild(article);
         });
         }
@@ -412,7 +480,7 @@
             if (item.city) params.set('kota', item.city);
             if (item.transaction) params.set('transaksi', item.transaction);
             if (item.type) params.append('tipe', item.type);
-            return 'cari-properti.html?' + params.toString();
+            return 'cari-properti?' + params.toString();
         }
 
         function shuffle(arr) {
@@ -461,5 +529,7 @@
     })();
     </script>
 
+    <script type="module" src="/src/navbar.js"></script>
+    <script type="module" src="/src/footer.js"></script>
 </body>
 </html>
