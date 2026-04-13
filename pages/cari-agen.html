@@ -263,7 +263,7 @@
         if (state.sort && state.sort !== 'rating_desc') params.set('urut', state.sort);
         if (state.page > 1) params.set('hal', String(state.page));
         var qs = params.toString();
-        var url = '/cari-agen' + (qs ? '?' + qs : '');
+        var url = './cari-agen.html' + (qs ? '?' + qs : '');
         if (history.replaceState) history.replaceState(null, '', url);
     }
 
