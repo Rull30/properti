@@ -140,7 +140,7 @@
     var transQs = p.transaction === 'disewa' ? 'disewa' : 'dijual';
     var bc = document.getElementById('breadcrumb');
     bc.innerHTML =
-        '<a href="/" class="hover:text-brand">Beranda</a><span class="text-slate-300">/</span>' +
+        '<a href="./index.html" class="hover:text-brand">Beranda</a><span class="text-slate-300">/</span>' +
         '<a href="cari-properti?transaksi=' + transQs + '" class="hover:text-brand">' + (p.transaction === 'dijual' ? 'Dijual' : 'Disewa') + '</a><span class="text-slate-300">/</span>' +
         '<a href="cari-properti?kota=' + encodeURIComponent(p.city) + '" class="hover:text-brand">' + esc(p.city) + '</a><span class="text-slate-300">/</span>' +
         '<span class="text-slate-800 font-medium">' + esc(p.location) + '</span>';
@@ -301,7 +301,7 @@
     var initials = aname ? aname.split(/\s+/).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase() : '?';
     var ahref = agent ? 'agen-detail?id=' + encodeURIComponent(agent.id) : '#';
     var waNumber = p && p.whatsapp ? String(p.whatsapp) : (agent && agent.phone ? String(agent.phone) : '');
-    var detailPath = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl(p.id) : ('properti-detail?id=' + encodeURIComponent(String(p.id)));
+    var detailPath = typeof window.getListingDetailUrl === 'function' ? window.getListingDetailUrl(p.id) : ('./properti-detail.html?id=' + encodeURIComponent(String(p.id)));
     var detailUrl = '';
     try {
         detailUrl = new URL(detailPath, window.location.origin).href;
@@ -311,7 +311,7 @@
     var waMsg = 'permisi, saya tertarik dengan properti ini.\n\nLink detail properti:\n' + detailUrl;
     var waHref = 'https://wa.me/' + encodeURIComponent(waNumber) + '?text=' + encodeURIComponent(waMsg);
     var canEdit = typeof window.AgentAuth !== 'undefined' && typeof window.AgentAuth.isLoggedIn === 'function' && window.AgentAuth.isLoggedIn();
-    var editHref = '/agent/listing-form?id=' + encodeURIComponent(String(p.id));
+    var editHref = './agent/listing-form.html?id=' + encodeURIComponent(String(p.id));
     document.getElementById('agent-card').innerHTML =
         '<h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Hubungi agen</h2>' +
         '<div class="flex items-center gap-3 mb-4">' +

@@ -381,7 +381,7 @@
     }
 
     w.getListingDetailUrl = function (id) {
-        return '/properti-detail?id=' + encodeURIComponent(String(id));
+        return './properti-detail.html?id=' + encodeURIComponent(String(id));
     };
 
     w.getListingImages = function (p) {
