@@ -22,6 +22,7 @@ const pageInputs = collectHtmlInputs(path.join(__dirname, 'pages'));
 
 module.exports = defineConfig({
   publicDir: 'public',
+  base: '/properti/',
   build: {
     rollupOptions: {
       input: pageInputs,
