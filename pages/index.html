@@ -30,6 +30,9 @@
         body { font-family: 'Inter', system-ui, sans-serif; }
         .tab-active { background: #fff; color: #E02020; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
         .tab-inactive { color: #64748b; }
+        .home-carousel-slide { opacity: 0; pointer-events: none; transition: opacity .5s ease; }
+        .home-carousel-slide.active { opacity: 1; pointer-events: auto; }
+        .home-carousel-dot.active { background-color: #ffffff; transform: scale(1.05); }
     </style>
 </head>
 <body class="bg-[#f5f5f5] text-slate-800 antialiased">
@@ -37,8 +40,46 @@
     <!-- Header utama -->
     <div data-navbar-host data-navbar-active=""></div>
 
+    <!-- Carousel -->
+    <section class="w-full px-2 sm:px-4 mt-2 mb-8">
+        <div id="home-carousel" class="relative w-full h-[25rem] rounded-2xl overflow-hidden bg-slate-200 shadow-sm">
+            <a href="cari-properti?transaksi=dijual" class="home-carousel-slide active absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?auto=format&fit=crop&w=1600&q=80" alt="Promo properti dijual" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/65 via-black/30 to-transparent"></div>
+                <div class="absolute left-6 sm:left-10 bottom-8 sm:bottom-10 text-white max-w-xl">
+                    <p class="text-xs sm:text-sm font-semibold uppercase tracking-wide text-brand-light">Pilihan terbaik</p>
+                    <h2 class="text-2xl sm:text-4xl font-bold leading-tight mt-1">Temukan rumah impian di lokasi favoritmu</h2>
+                    <p class="text-sm sm:text-base text-white/90 mt-2">Lihat listing terbaru dengan harga kompetitif dan data yang terus diperbarui.</p>
+                </div>
+            </a>
+            <a href="kalkulator-kpr" class="home-carousel-slide absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80" alt="Hitung simulasi KPR" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/35 to-transparent"></div>
+                <div class="absolute left-6 sm:left-10 bottom-8 sm:bottom-10 text-white max-w-xl">
+                    <p class="text-xs sm:text-sm font-semibold uppercase tracking-wide text-brand-light">Cicilan lebih pasti</p>
+                    <h2 class="text-2xl sm:text-4xl font-bold leading-tight mt-1">Simulasikan KPR sebelum memilih properti</h2>
+                    <p class="text-sm sm:text-base text-white/90 mt-2">Bandingkan skema pembiayaan agar keputusan beli jadi lebih yakin.</p>
+                </div>
+            </a>
+            <a href="peta-properti" class="home-carousel-slide absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80" alt="Jelajahi properti dari peta" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/65 via-black/30 to-transparent"></div>
+                <div class="absolute left-6 sm:left-10 bottom-8 sm:bottom-10 text-white max-w-xl">
+                    <p class="text-xs sm:text-sm font-semibold uppercase tracking-wide text-brand-light">Peta interaktif</p>
+                    <h2 class="text-2xl sm:text-4xl font-bold leading-tight mt-1">Cari properti lebih cepat lewat peta</h2>
+                    <p class="text-sm sm:text-base text-white/90 mt-2">Jelajahi area strategis dan lihat listing berdasarkan lokasi secara langsung.</p>
+                </div>
+            </a>
+
+            <button type="button" id="home-carousel-prev" class="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/35 hover:bg-black/55 text-white grid place-items-center transition" aria-label="Slide sebelumnya">‹</button>
+            <button type="button" id="home-carousel-next" class="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/35 hover:bg-black/55 text-white grid place-items-center transition" aria-label="Slide berikutnya">›</button>
+
+            <div id="home-carousel-dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2"></div>
+        </div>
+    </section>
+
     <!-- Hero + pencarian -->
-    <section class="relative bg-gradient-to-b from-white to-[#f0f4f8] pt-8 pb-12 sm:pt-10 sm:pb-16 border-b border-slate-200/60">
+    <section class=" bg-gradient-to-b from-white to-[#f0f4f8] pt-8 pb-12 sm:pt-10 sm:pb-16 border-b border-slate-200/60">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2">
                 Jual Beli dan Sewa Properti Jadi Mudah
@@ -192,6 +233,67 @@
     <script src="/listings-data.js"></script>
     <script src="/listings-user-storage.js"></script>
     <script>
+    (function () {
+        var root = document.getElementById('home-carousel');
+        if (!root) return;
+        var slides = Array.prototype.slice.call(root.querySelectorAll('.home-carousel-slide'));
+        var prev = document.getElementById('home-carousel-prev');
+        var next = document.getElementById('home-carousel-next');
+        var dotsWrap = document.getElementById('home-carousel-dots');
+        if (!slides.length || !prev || !next || !dotsWrap) return;
+
+        var current = 0;
+        var timer = null;
+
+        function renderDots() {
+            dotsWrap.innerHTML = slides.map(function (_, idx) {
+                var active = idx === current ? ' active' : '';
+                return '<button type="button" class="home-carousel-dot' + active + ' w-2.5 h-2.5 rounded-full bg-white/60 hover:bg-white transition" aria-label="Pilih slide ' + String(idx + 1) + '" data-index="' + String(idx) + '"></button>';
+            }).join('');
+        }
+
+        function renderSlides() {
+            slides.forEach(function (slide, idx) {
+                slide.classList.toggle('active', idx === current);
+            });
+            renderDots();
+        }
+
+        function goTo(index) {
+            current = (index + slides.length) % slides.length;
+            renderSlides();
+        }
+
+        function startAuto() {
+            if (timer) clearInterval(timer);
+            timer = setInterval(function () {
+                goTo(current + 1);
+            }, 5500);
+        }
+
+        prev.addEventListener('click', function () {
+            goTo(current - 1);
+            startAuto();
+        });
+
+        next.addEventListener('click', function () {
+            goTo(current + 1);
+            startAuto();
+        });
+
+        dotsWrap.addEventListener('click', function (ev) {
+            var target = ev.target;
+            if (!target || !target.matches('button[data-index]')) return;
+            var idx = parseInt(target.getAttribute('data-index'), 10);
+            if (Number.isNaN(idx)) return;
+            goTo(idx);
+            startAuto();
+        });
+
+        renderSlides();
+        startAuto();
+    })();
+
     (function () {
         var grid = document.getElementById('home-featured-grid');
         var pop = document.getElementById('home-popular-projects');
